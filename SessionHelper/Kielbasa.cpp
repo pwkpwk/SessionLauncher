@@ -5,7 +5,7 @@ namespace SessionHelper
 {
 	Kielbasa::Kielbasa()
 	{
-		m_clientAx = ::LoadLibrary(TEXT("Resources\\rdclientax.dll"));
+		m_clientAx = ::LoadLibrary(TEXT("rdclientax.dll"));
 		if (!m_clientAx)
 		{
 			DWORD error = ::GetLastError();
