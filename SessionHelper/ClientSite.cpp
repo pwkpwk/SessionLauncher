@@ -15,7 +15,7 @@ void ClientSite::FinalRelease()
 
 STDMETHODIMP ClientSite::SaveObject()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 STDMETHODIMP ClientSite::GetMoniker(DWORD dwAssign, DWORD dwWhichMoniker, __RPC__deref_out_opt IMoniker **ppmk)
@@ -30,12 +30,12 @@ STDMETHODIMP ClientSite::GetContainer(__RPC__deref_out_opt IOleContainer **ppCon
 
 STDMETHODIMP ClientSite::ShowObject()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 STDMETHODIMP ClientSite::OnShowWindow(BOOL fShow)
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 STDMETHODIMP ClientSite::RequestNewObjectLayout()
