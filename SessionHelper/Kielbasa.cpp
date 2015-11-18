@@ -41,6 +41,32 @@ namespace SessionHelper
 
 	void Kielbasa::LaunchSession()
 	{
+		LPOLEINPLACEACTIVEOBJECT obj;
+
+		if (SUCCEEDED(m_rdpClient->QueryInterface(&obj)))
+		{
+			HWND hwnd;
+
+			HRESULT hr;
+			LPOLEOBJECT oleobj = nullptr;
+
+			hr = m_rdpClient->QueryInterface(&oleobj);
+
+			if (SUCCEEDED(hr))
+			{
+				RECT rc = { 0 };
+				HWND hwnd = reinterpret_cast<HWND>((HANDLE)m_windowHelper->Handle);
+				LPOLECLIENTSITE site = nullptr;
+
+				::GetClientRect(hwnd, &rc);
+				oleobj->GetClientSite(&site);
+				hr = oleobj->DoVerb(OLEIVERB_PRIMARY, NULL, site, 0, hwnd, &rc);
+				site->Release();
+				oleobj->Release();
+			}
+
+			obj->Release();
+		}
 	}
 
 	bool Kielbasa::Initialize()
@@ -164,6 +190,10 @@ namespace SessionHelper
 		{
 			LPOLEOBJECT oobj;
 			site->AddRef();
+
+			//
+			// TODO: attach a window handle to the client site
+			//
 
 			if (SUCCEEDED(rdpClient->QueryInterface(&oobj)))
 			{
