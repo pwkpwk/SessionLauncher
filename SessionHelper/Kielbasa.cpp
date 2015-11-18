@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Kielbasa.h"
 #include "SessionCallback.h"
+#include "ClientSite.h"
 
 namespace SessionHelper
 {
@@ -38,6 +39,10 @@ namespace SessionHelper
 		::FreeLibrary(m_clientAx);
 	}
 
+	void Kielbasa::LaunchSession()
+	{
+	}
+
 	bool Kielbasa::Initialize()
 	{
 		m_clientAx = ::LoadLibrary(TEXT("rdclientax.dll"));
@@ -62,8 +67,16 @@ namespace SessionHelper
 
 					if (RegisterCallback(ptr, &cookie))
 					{
-						m_rdpClient = ptr;
-						m_callbackCookie = cookie;
+						if (!SetClientSite(ptr))
+						{
+							UnregisterCallback(ptr, cookie);
+						}
+						else
+						{
+							m_rdpClient = ptr;
+							m_callbackCookie = cookie;
+						}
+
 						created = true;
 					}
 					else
@@ -141,4 +154,27 @@ namespace SessionHelper
 		return unregistered;
 	}
 
+	_Check_return_
+	bool Kielbasa::SetClientSite(_In_ LPUNKNOWN rdpClient)
+	{
+		bool						set = false;
+		ATL::CComObject<ClientSite> *site;
+
+		if (SUCCEEDED(ATL::CComObject<ClientSite>::CreateInstance(&site)))
+		{
+			LPOLEOBJECT oobj;
+			site->AddRef();
+
+			if (SUCCEEDED(rdpClient->QueryInterface(&oobj)))
+			{
+				if (SUCCEEDED(oobj->SetClientSite(site)))
+					set = true;
+				oobj->Release();
+			}
+
+			site->Release();
+		}
+
+		return set;
+	}
 }

@@ -17,6 +17,8 @@ namespace SessionHelper
 		static Kielbasa ^Create(WindowInteropHelper ^windowHelper);
 		virtual ~Kielbasa();
 
+		void LaunchSession();
+
 	private:
 		Kielbasa(WindowInteropHelper ^windowHelper);
 		bool Initialize();
@@ -27,5 +29,7 @@ namespace SessionHelper
 		static bool RegisterCallback(_In_ LPUNKNOWN rdpClient, _Out_ DWORD *cookie);
 		_Check_return_
 		static bool UnregisterCallback(_In_ LPUNKNOWN rdpClient, DWORD cookie);
+		_Check_return_
+		bool SetClientSite(_In_ LPUNKNOWN rdpClient);
 	};
 }

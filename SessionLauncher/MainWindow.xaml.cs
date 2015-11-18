@@ -22,5 +22,10 @@
             _kielbasa.Dispose();
             base.OnClosed(e);
         }
+
+        private void OnLaunchSessionClicked(object sender, RoutedEventArgs e)
+        {
+            _kielbasa.LaunchSession();
+        }
     }
 }
