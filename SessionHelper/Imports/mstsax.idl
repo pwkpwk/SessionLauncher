@@ -1,0 +1,6603 @@
+// ----------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//
+//  Copyright (C) Microsoft Corporation, 1998 - 2003
+//
+//  IDL File for MS RDP Control
+//
+//  File: mstsax.idl
+//
+// ----------------------------------------------------------------------------
+
+#include <olectl.h>
+
+
+//
+// This file will be processed by the MIDL tool to
+// produce the type library (mstsax.tlb) and marshalling code.
+//
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "rdpappcontainerclient.idl";
+
+
+//------------------------------------------------------------------------------
+// Extended Disconnect Reason
+// enum values are mapped from values
+// from the published header tserrs.h
+//
+typedef enum {
+    exDiscReasonNoInfo                            = 0x0000,
+    exDiscReasonAPIInitiatedDisconnect            = 0x0001,
+    exDiscReasonAPIInitiatedLogoff                = 0x0002,
+    exDiscReasonServerIdleTimeout                 = 0x0003,
+    exDiscReasonServerLogonTimeout                = 0x0004,
+    exDiscReasonReplacedByOtherConnection         = 0x0005,
+    exDiscReasonOutOfMemory                       = 0x0006,
+    exDiscReasonServerDeniedConnection            = 0x0007,
+    exDiscReasonServerDeniedConnectionFips        = 0x0008,
+    exDiscReasonServerInsufficientPrivileges      = 0x0009,
+    exDiscReasonServerFreshCredsRequired          = 0x000A,
+    exDiscReasonRpcInitiatedDisconnectByUser      = 0x000B,
+    exDiscReasonLogoffByUser                      = 0x000C,
+
+    exDiscReasonLicenseInternal                   = 0x0100,
+    exDiscReasonLicenseNoLicenseServer            = 0x0101,
+    exDiscReasonLicenseNoLicense                  = 0x0102,
+    exDiscReasonLicenseErrClientMsg               = 0x0103,
+    exDiscReasonLicenseHwidDoesntMatchLicense     = 0x0104,
+    exDiscReasonLicenseErrClientLicense           = 0x0105,
+    exDiscReasonLicenseCantFinishProtocol         = 0x0106,
+    exDiscReasonLicenseClientEndedProtocol        = 0x0107,
+    exDiscReasonLicenseErrClientEncryption        = 0x0108,
+    exDiscReasonLicenseCantUpgradeLicense         = 0x0109,
+    exDiscReasonLicenseNoRemoteConnections        = 0x010A,
+    exDiscReasonLicenseCreatingLicStoreAccDenied  = 0x010B,
+
+    exDiscReasonRdpEncInvalidCredentials          = 0x0300,
+
+    exDiscReasonProtocolRangeStart                = 0x1000,
+    exDiscReasonProtocolRangeEnd                  = 0x7FFF
+} ExtendedDisconnectReasonCode;
+
+typedef enum {
+    UsbDevice           = 0
+} RedirectDeviceType;
+
+typedef enum {
+    FullMode = 0,
+    ThinClientMode,         // smaller cache and video codec
+    SmallCacheMode          // same as FullMode but with smaller cache
+} ClientSpec;
+
+// ----------------------------------------------------------------------------
+// Constant defines
+//
+
+const int AUDIOREDIRECT_TO_CLIENT = 0;
+const int AUDIOREDIRECT_ON_SERVER = 1;
+const int AUDIOREDIRECT_NOAUDIO   = 2;
+
+// ----------------------------------------------------------------------------
+// IMsTscAx interface
+//
+const int DISPID_METHOD_CONNECT               = 30;
+const int DISPID_METHOD_DISCONNECT            = 31;
+const int DISPID_METHOD_CREATEVIRTUALCHANNELS = 33;
+const int DISPID_METHOD_SENDONVIRTUALCHANNEL  = 34;
+
+const int DISPID_PROP_SERVER                  = 1;
+const int DISPID_PROP_DOMAIN                  = 2;
+const int DISPID_PROP_USERNAME                = 3;
+const int DISPID_PROP_DISCONNECTED_TEXT       = 4;
+const int DISPID_PROP_CONNECTING_TEXT         = 5;
+const int DISPID_PROP_CONNECTED               = 6;
+const int DISPID_PROP_DESKTOPWIDTH            = 12;
+const int DISPID_PROP_DESKTOPHEIGHT           = 13;
+const int DISPID_PROP_STARTCONNECTED          = 16;
+const int DISPID_PROP_HORIZSCROLLBAR          = 17;
+const int DISPID_PROP_VERTSCROLLBAR           = 18;
+const int DISPID_PROP_FULLSCREENTITLE         = 19;
+const int DISPID_PROP_CIPHERSTRENGTH          = 20;
+const int DISPID_PROP_VERSION                 = 21;
+const int DISPID_PROP_SECUREDSETTINGSENABLED  = 22;
+const int DISPID_PROP_SECUREDSETTINGS         = 97;
+const int DISPID_PROP_ADVSETTINGS             = 98;
+const int DISPID_PROP_DEBUGGER                = 99;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient interface
+//
+
+const int DISPID_METHOD_SET_VIRTUALCHANNELOPTIONS = 35;
+const int DISPID_METHOD_GET_VIRTUALCHANNELOPTIONS = 36;
+const int DISPID_METHOD_REQUESTCLOSE              = 37;
+
+const int DISPID_PROP_COLORDEPTH                  = 100;
+const int DISPID_PROP_ADVSETTINGS2                = 101;
+const int DISPID_PROP_SECUREDSETTINGS2            = 102;
+const int DISPID_PROP_EXTENDEDDISCONNECTREASON    = 103;
+const int DISPID_PROP_FULLSCREEN                  = 104;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient2 interface
+//
+
+const int DISPID_PROP_ADVSETTINGS3          = 200;
+const int DISPID_PROP_CONNECTED_STATUS_TEXT = 201;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient3 interface
+//
+
+const int DISPID_PROP_ADVSETTINGS4 = 300;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient4 interface
+//
+
+const int DISPID_PROP_ADVSETTINGS5 = 400;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient5 interface
+//
+
+const int DISPID_PROP_TRANSPORT_CONNECTION    = 500;
+const int DISPID_PROP_ADVSETTINGS6            = 502;
+const int DISPID_METHOD_GET_ERROR_DESCRIPTION = 503;
+const int DISPID_PROP_REMOTEPROGRAM           = 504;
+const int DISPID_PROP_MSRDPCLIENTSHELL        = 505;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient6 interface
+//
+
+const int DISPID_PROP_TRANSPORT_CONNECTION2   = 506;
+const int DISPID_PROP_ADVSETTINGS7            = 507;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient7 interface
+//
+
+const int DISPID_PROP_ADVSETTINGS8            = 600;
+const int DISPID_PROP_TRANSPORT_CONNECTION3   = 601;
+const int DISPID_METHOD_GET_STATUS_TEXT       = 602;
+const int DISPID_PROP_SECUREDSETTINGS3        = 603;
+const int DISPID_PROP_REMOTEPROGRAM2          = 604;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient8 interface
+//
+
+const int DISPID_METHOD_REMOTE_ACTIONS              = 700;
+const int DISPID_PROP_ADVSETTINGS9                  = 701;
+const int DISPID_METHOD_RECONNECT                   = 702;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient9 interface
+//
+
+const int DISPID_PROP_TRANSPORT_CONNECTION4               = 800;
+const int DISPID_METHOD_SYNC_SESSION_DISPLAY_SETTINGS     = 801;
+const int DISPID_METHOD_UPDATE_SESSION_DISPLAY_SETTINGS   = 802;
+const int DISPID_METHOD_ATTACH_EVENT                      = 803;
+const int DISPID_METHOD_DETACH_EVENT                      = 804;
+// Uncomment for testing purposes.  Do not ship enabled.
+//const int DISPID_METHOD_TEST_EVENTS                       = 899;
+
+// ----------------------------------------------------------------------------
+// IMsTscAdvancedSettings interface
+//
+
+const int DISPID_PROP_ADV_COMPRESS             = 121;
+const int DISPID_PROP_ADV_BITMAPPERISTENCE     = 122;
+const int DISPID_PROP_ADV_ALLOWBACKGROUNDINPUT = 161;
+const int DISPID_PROP_ADV_KEYBOARDLAYOUTSTR    = 162;
+const int DISPID_PROP_ADV_PLUGINDLLS           = 170;
+const int DISPID_PROP_ADV_ICONFILE             = 171;
+const int DISPID_PROP_ADV_ICONINDEX            = 172;
+const int DISPID_PROP_ADV_CONTAINER_FULLSCREEN = 173;
+const int DISPID_PROP_ADV_DISABLE_RDPDR        = 174;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings interface
+//
+
+const int DISPID_PROP_ADV_SMOOTHSCROLL                  = 101;
+const int DISPID_PROP_ADV_ACCELERATORPASSTHROUGH        = 102;
+const int DISPID_PROP_ADV_SHADOWBITMAP                  = 103;
+const int DISPID_PROP_ADV_TRANSPORTTYPE                 = 104;
+const int DISPID_PROP_ADV_SASSEQUENCE                   = 105;
+const int DISPID_PROP_ADV_ENCRYPTIONENABLED             = 106;
+const int DISPID_PROP_ADV_DEDICATEDTERMINAL             = 107;
+const int DISPID_PROP_ADV_RDPPORT                       = 108;
+const int DISPID_PROP_ADV_ENABLEMOUSE                   = 109;
+const int DISPID_PROP_ADV_DISABLECTRLALTDEL             = 110;
+const int DISPID_PROP_ADV_ENABLEWINDOWSKEY              = 111;
+const int DISPID_PROP_ADV_DOUBLECLICKDETECT             = 112;
+const int DISPID_PROP_ADV_MAXIMIZESHELL                 = 113;
+const int DISPID_PROP_ADV_HOTKEYFULLSCREEN              = 114;
+const int DISPID_PROP_ADV_HOTKEYCTRLESC                 = 115;
+const int DISPID_PROP_ADV_HOTKEYALTESC                  = 116;
+const int DISPID_PROP_ADV_HOTKEYALTTAB                  = 117;
+const int DISPID_PROP_ADV_HOTKEYALTSHIFTTAB             = 118;
+const int DISPID_PROP_ADV_HOTKEYALTSPACE                = 119;
+const int DISPID_PROP_ADV_HOTKEYCTRLALTDEL              = 120;
+const int DISPID_PROP_ADV_ORDERDRAWTHRESHOLD            = 123;
+const int DISPID_PROP_ADV_BITMAPCACHESIZE               = 124;
+const int DISPID_PROP_ADV_BITMAPVIRTUALCACHESIZE        = 125;
+const int DISPID_PROP_ADV_NUMBITMAPCACHES               = 126;
+const int DISPID_PROP_ADV_CACHEPERSISTENCEACTIVE        = 127;
+
+const int DISPID_PROP_ADV_PERSISTCACHEDIRECTORY         = 138;
+
+const int DISPID_PROP_ADV_BRUSHSUPPORTLEVEL             = 156;
+const int DISPID_PROP_ADV_MININPUTSENDINTERVAL          = 157;
+const int DISPID_PROP_ADV_INPUTEVENTSATONCE             = 158;
+const int DISPID_PROP_ADV_MAXEVENTCOUNT                 = 159;
+const int DISPID_PROP_ADV_KEEPALIVEINTERVAL             = 160;
+const int DISPID_PROP_ADV_SHUTDOWNTIMEOUT               = 163;
+const int DISPID_PROP_ADV_OVERALLCONNECTIONTIMEOUT      = 164;
+const int DISPID_PROP_ADV_SINGLECONNECTIONTIMEOUT       = 165;
+const int DISPID_PROP_ADV_KEYBOARDTYPE                  = 166; // WINCE ONLY
+const int DISPID_PROP_ADV_KEYBOARDSUBTYPE               = 167; // WINCE ONLY
+const int DISPID_PROP_ADV_KEYBOARDFUNCTIONKEY           = 168; // WINCE ONLY
+const int DISPID_PROP_ADV_WINCEFIXEDPALETTE             = 169; // WINCE ONLY
+const int DISPID_PROP_ADV_SCALEBITMAPCACHESBYBPP        = 175;
+const int DISPID_PROP_ADV_CONNECT_TO_SERVER_CONSOLE     = 178; // Do not use! Use DISPID_PROP_ADV_CONNECT_TO_SERVER_CONSOLE
+const int DISPID_PROP_ADV_BITMAPPERSISTENCE             = 182;
+const int DISPID_PROP_ADV_MINUTESTOIDLETIMEOUT          = 183;
+
+const int DISPID_PROP_ADV_SMART_SIZING                  = 184;
+
+const int DISPID_PROP_ADV_RDPDR_LOCALPRINTINGDOCNAME    = 185;
+const int DISPID_PROP_ADV_CLEARTEXTPASSWORD             = 186;
+const int DISPID_PROP_ADV_DISPLAYCONNECTIONBAR          = 187;
+const int DISPID_PROP_ADV_PINCONNECTIONBAR              = 188;
+const int DISPID_PROP_ADV_GRABFOCUSONCONNECT            = 189;
+const int DISPID_PROP_ADV_LOADBALANCE_INFO              = 190;
+const int DISPID_PROP_ADV_REDIRECT_DRIVES               = 191;
+const int DISPID_PROP_ADV_REDIRECT_PRINTERS             = 192;
+const int DISPID_PROP_ADV_REDIRECT_PORTS                = 193;
+const int DISPID_PROP_ADV_REDIRECT_SMARTCARDS           = 194;
+const int DISPID_PROP_ADV_BITMAPVIRTUALCACHE16BPPSIZE   = 195;
+const int DISPID_PROP_ADV_BITMAPVIRTUALCACHE24BPPSIZE   = 196;
+
+const int DISIPD_PROP_ADV_PERFORMANCEFLAGS              = 200;
+const int DISPID_PROP_ADV_RDPDR_CLIPCLEANTEMPDIR_STRING = 201;
+const int DISPID_PROP_ADV_RDPDR_CLIPPASTEINFO_STRING    = 202;
+
+//
+// Special salem connection socket
+//
+const int DISPID_PROP_ADV_CONNECTIONSOCKET              = 203;
+const int DISPID_PROP_ADV_NOTIFYTSPUBLICKEY             = 204;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings2 interface
+//
+
+const int DISPID_PROP_ADV_CANAUTORECONNECT     = 205;
+const int DISPID_PROP_ADV_ENABLEAUTORECONNECT  = 206;
+const int DISPID_PROP_ADV_MAXRECONNECTATTEMPTS = 207;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings3 interface
+//
+
+const int DISPID_PROP_ADV_CONBAR_SHOWMINIMIZE = 210;
+const int DISPID_PROP_ADV_CONBAR_SHOWRESTORE  = 211;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings4 interface
+//
+
+const int DISPID_PROP_ADV_AUTH_LEVEL = 212;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings5 interface
+//
+
+const int DISPID_PROP_ADV_REDIRECT_CLIPBOARD               = 213;
+const int DISPID_PROP_ADV_AUDIO_REDIRECTION_MODE           = 215;
+const int DISPID_PROP_ADV_CONBAR_SHOWPIN                   = 216;
+const int DISPID_PROP_ADV_PUBLIC_MODE                      = 217;
+const int DISPID_PROP_ADV_DEVICE_REDIRECT                  = 218;
+const int DISPID_PROP_ADV_POS_DEVICE_REDIRECT              = 219;
+const int DISPID_PROP_ADV_BITMAPVIRTUALCACHE32BPPSIZE      = 220;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings6 interface
+//
+
+const int DISPID_PROP_ADV_RELATIVEMOUSEMODE             = 221;
+const int DISPID_PROP_ADV_AUTH_SERVICE_CLASS            = 222;
+const int DISPID_PROP_ADV_PCB                           = 223;
+const int DISPID_PROP_ADV_HOTKEYFOCUSRELEASELEFT        = 224;
+const int DISPID_PROP_ADV_HOTKEYFOCUSRELEASERIGHT       = 225;
+const int DISPID_PROP_ADV_AUTH_TYPE                     = 226;
+const int DISPID_PROP_ADV_CONNECT_TO_ADMINISTER_SERVER  = 227; 
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings7 interface
+//
+const int DISPID_PROP_ADV_AUDIO_CAPTURE_REDIRECTION_MODE = 228;
+const int DISPID_PROP_ADV_VIDEO_PLAYBACK_MODE            = 229;
+const int DISPID_PROP_ADV_ENABLE_SUPERPAN                = 230;
+const int DISPID_PROP_ADV_SUPERPAN_ACCEL_FACTOR          = 231;
+const int DISPID_PROP_ADV_NEG_SEC_LAYER                  = 232;
+const int DISPID_PROP_ADV_AUDIO_QUALITY_MODE             = 233;
+const int DISPID_PROP_ADV_REDIRECT_DIRECTX               = 234;
+const int DISPID_PROP_ADV_NETWORK_CONNECTION_TYPE        = 235;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings8 interface
+//
+const int DISPID_PROP_ADV_BANDWIDTH_AUTODETECT           = 236;
+const int DISPID_PROP_ADV_CLIENT_PROTOCOL_SPEC           = 237;
+
+// ----------------------------------------------------------------------------
+// IMsTscSecuredSettings interface
+// (Contains properties secured for scripting from web browser.)
+//
+
+const int DISPID_PROP_SECURED_STARTPROGRAM = 1;
+const int DISPID_PROP_SECURED_WORKDIR      = 2;
+const int DISPID_PROP_SECURED_FULLSCREEN   = 3;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientSecuredSettings interface
+//
+
+const int DISPID_PROP_SECURED_KEYBOARD_HOOKING_MODE  = 4;
+const int DISPID_PROP_SECURED_AUDIO_REDIRECTION_MODE = 5;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientSecuredSettings2 interface
+//
+
+const int DISPID_PROP_SECURED_PCB = 6;
+
+// ----------------------------------------------------------------------------
+// IMsTscDebug interface
+//
+
+const int DISPID_PROP_DBG_HATCH_BMP_PDU                         = 200;
+const int DISPID_PROP_DBG_HATCH_SSB_ORDER                       = 201;
+const int DISPID_PROP_DBG_HATCH_MEMBLT_ORDER                    = 202;
+const int DISPID_PROP_DBG_HATCH_INDEX_PDU                       = 203;
+const int DISPID_PROP_DBG_LABEL_MEMBLT                          = 204;
+const int DISPID_PROP_DBG_BMP_CACHE_MON                         = 205;
+const int DISPID_PROP_DBG_MALLOC_FAILURES                       = 206;
+const int DISPID_PROP_DBG_MALLOC_HUGE_FAILURES                  = 207;
+const int DISPID_PROP_DBG_NET_THRUPUT                           = 208;
+const int DISPID_PROP_DBG_CLX_CMDLINE                           = 209;
+const int DISPID_PROP_DBG_CLX_CLXDLL                            = 210;
+const int DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_VIS               = 211;
+const int DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_VIS_NODATA        = 212;
+const int DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_NONVIS            = 213;
+const int DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_WINDOW            = 214;
+const int DISPID_PROP_DBG_REMOTEPROGRAM_STAYCONNECTED_ONBADCAPS = 215;
+const int DISPID_PROP_DBG_CONTROL_TYPE                          = 216;
+const int DISPID_PROP_DISABLE_GFX_DECODING                      = 217;
+
+// ----------------------------------------------------------------------------
+// ITSRemoteProgram interface
+//
+
+const int DISPID_PROP_REMOTEPROGRAM_REMOTEPROGRAMMODE = 200;
+const int DISPID_REMOTEPROGRAM_SERVER_START_PROGRAM   = 201;
+const int DISPID_PROP_REMOTEPROGRAM_REMOTE_APPLICATIONNAME = 202;
+const int DISPID_PROP_REMOTEPROGRAM_REMOTE_APPLICATION_PROGRAM = 203;
+const int DISPID_PROP_REMOTEPROGRAM_REMOTE_APPLICATION_ARGS = 204;
+
+// ----------------------------------------------------------------------------
+// IMsRdpDeviceCollection and IMsRdpDevice interface
+//
+
+const int DISPID_PROP_GET_FRIENDLY_NAME       = 220;
+const int DISPID_PROP_GET_DEVICE_DESC         = 221;
+const int DISPID_PROP_GET_DEV_ID              = 222;
+const int DISPID_PROP_REDIR_STATE             = 223;
+const int DISPID_PROP_GET_INDEX               = 224;
+const int DISPID_PROP_GET_DEVICECOUNT         = 225;
+const int DISPID_PROP_RESCAN                  = 226;
+const int DISPID_PROP_DEVBYID                 = 227;
+const int DISPID_PROP_DEVBYINDEX              = 228;
+const int DISPID_PROP_USB                     = 229;
+const int DISPID_PROP_GET_DRIVE_LETTER_BITMAP = 230;
+const int DISPID_PROP_GET_DEVICE_TEXT         = 231;
+const int DISPID_PROP_COMPOSITE               = 232;
+const int DISPID_PROP_REDIRECTNOW             = 233;
+const int DISPID_PROP_ADDDEVICEBYINSTANCEID   = 234;
+
+// ----------------------------------------------------------------------------
+// IMsRdpDriveCollection and IMsRdpDrive interface
+//
+const int DISPID_PROP_GET_DRIVE_NAME         = 229;
+const int DISPID_PROP_DRIVE_REDIR_STATE      = 230;
+const int DISPID_PROP_DRIVEBYINDEX           = 231;
+const int DISPID_PROP_RESCANDRIVES           = 232;
+const int DISPID_PROP_GET_DRIVECOUNT         = 233;
+const int DISPID_PROP_GET_DRIVE_LETTER_INDEX = 234;
+const int DISPID_PROP_CM_DEVINST             = 235;
+const int DISPID_PROP_OPTIONAL               = 236;
+const int DISPID_PROP_CM_CLASS_GUID          = 237;
+
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings interface
+//
+
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYHOSTNAME                = 210;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYUSAGEMETHOD             = 211;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYPROFILEUSAGEMETHOD      = 212;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSSOURCE             = 213;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYISSUPPORTED             = 214;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYDEFAULTUSAGEMETHOD      = 215;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYUSERSELECTEDCREDSSOURCE = 216;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings2 interface
+//
+
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYREQUIREPREAUTH    = 217;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYPREAUTHSERVERADDR = 218;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYSUPPORTURL        = 219;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYOTPCOOKIE         = 220;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYOTPCOOKIESIZE     = 221;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSHARING       = 222;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYUSERNAME          = 223;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYDOMAIN            = 224;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYPASSWORD          = 225;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings3 interface
+//
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSOURCECOOKIE     = 226;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIESERVERADDR = 227;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIE           = 228;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIESIZE       = 229;
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHLOGINPAGE        = 230;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings4 interface
+//
+const int DISPID_PROP_TRANSPORT_HTTP_PROXYBROKERINGTYPE        = 231;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientShell interface
+// (Mstsc settings for portal launch.)
+//
+
+const int DISPID_METHOD_CLIENTSHELL_LAUNCH                    = 201;
+const int DISPID_PROP_CLIENTSHELL_RDPFILE_CONTENTS            = 202;
+const int DISPID_METHOD_CLIENTSHELL_SET_RDPPROPERTY           = 203;
+const int DISPID_METHOD_CLIENTSHELL_GET_RDPPROPERTY           = 204;
+const int DISPID_PROP_CLIENTSHELL_REMOTE_APP_CLIENT_INSTALLED = 205;
+const int DISPID_PROP_CLIENTSHELL_PUBLIC_MODE                 = 211;
+const int DISPID_METHOD_CLIENTSHELL_SHOW_TRUSTED_SITES_DLG    = 212;
+
+// ----------------------------------------------------------------------------
+// IMsTscNonScriptable interface
+// (For settings that can only be accessed through the V-TABLE interface.)
+//
+
+const int DISPID_PROP_CLEARTEXTPASSWORD = 1;
+const int DISPID_PROP_PORTABLEPASSWORD  = 2;
+const int DISPID_PROP_PORTABLESALT      = 3;
+const int DISPID_PROP_BINARYPASSWORD    = 4;
+const int DISPID_PROP_BINARYSALT        = 5;
+const int DISPID_METHOD_RESETPASSWORD   = 10;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable
+//
+const int DISPID_METHOD_NOTIFY_REDIRECT_DEVICE_CHANGE = 11;
+const int DISPID_METHOD_SENDKEYS                      = 12;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable2
+//
+const int DISPID_PROP_UI_PARENT_WINDOW_HANDLE = 13;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable3
+//
+const int DISPID_PROP_SHOW_RDRWARN_DLG        = 14;
+const int DISPID_PROP_PROMPT_FOR_CREDS        = 15;
+const int DISPID_PROP_NEG_SEC_LAYER           = 16;
+const int DISPID_PROP_ENABLE_CREDSSP_SUPPORT  = 17;
+const int DISPID_PROP_DEVICE_COLLECTION       = 18;
+const int DISPID_PROP_DRIVE_COLLECTION        = 19;
+const int DISPID_PROP_DYN_DEVICE_REDIRECT     = 20;
+const int DISPID_PROP_DYN_DRIVE_REDIRECT      = 21;
+const int DISPID_PROP_WARN_ABOUT_CLIPBOARD    = 22;
+const int DISPID_PROP_WARN_ABOUT_SENDINGCREDS = 23;
+const int DISPID_PROP_CONNECTIONBAR_TEXT      = 24;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable4
+//
+const int DISPID_PROP_RDRWARN_TYPE                   = 25;
+const int DISPID_PROP_PUBLISHER_CERTIFICATE_CHAIN    = 26;
+const int DISPID_PROP_WARN_ABOUT_PRINTERS            = 27;
+const int DISPID_PROP_SHELL_MARK_RDPSECURE           = 28;
+const int DISPID_PROP_ALLOW_CRED_SAVING              = 29;
+const int DISPID_PROP_PROMPT_FOR_CREDS_ON_CLIENT     = 30;
+const int DISPID_PROP_LAUNCHED_VIA_CLIENTSHELL_IFACE = 31;
+const int DISPID_PROP_TRUSTED_ZONE_SITE              = 32;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable5
+//
+const int DISPID_PROP_USE_MULTIMON                 = 33;
+const int DISPID_PROP_USING_MULTIMON               = 34;
+const int DISPID_PROP_REMOTE_MONITOR_COUNT         = 35;
+const int DISPID_METHOD_MONITOR_BOUNDING_BOX       = 36;
+const int DISPID_PROP_REMOTE_MONITORS_MATCH_LOCAL  = 37;
+const int DISPID_PROP_DISABLE_CONNECTION_BAR       = 38;
+const int DISPID_PROP_DISABLE_REMOTEAPPS_CAPSCHECK = 39; 
+const int DISPID_PROP_WARN_ABOUT_DIRECTX           = 40;
+const int DISPID_ALLOW_PROMPTING_FOR_CREDS         = 41;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientEncoderServices
+//
+const int DISPID_METHOD_SETWRITECOMPLETIONOPTIONS  = 242;
+const int DISPID_RDPSRAPI_PROP_FRAMEBUFFER_HEIGHT  = 251;
+const int DISPID_RDPSRAPI_PROP_FRAMEBUFFER_WIDTH   = 252;
+const int DISPID_RDPSRAPI_PROP_FRAMEBUFFER_BPP     = 253;
+const int DISPID_PROP_CROPPED_VIEW                                      = 254;
+const int DISPID_METHOD_GETFRAMEBITS                                    = 255;
+const int DISPID_METHOD_FORCEINPUTSYNC                                  = 256;
+const int DISPID_METHOD_SETCROPPEDVIEWRECT                              = 257;
+const int DISPID_METHOD_STARTRECORDING                                  = 258;
+const int DISPID_METHOD_STOPRECORDING                                   = 259;
+const int DISPID_METHOD_GETDESKTOP_BITMAP_INFO                          = 260;
+const int DISPID_METHOD_GETDESKTOP_BITMAP_BITS                          = 261;
+const int DISPID_PROP_DISABLE_INPUT                                     = 262;
+
+// ----------------------------------------------------------------------------
+// IMsRdpPreferredRedirectionInfo
+//
+const int DISPID_PROP_USE_REDIRECTION_SERVER_NAME = 1;
+
+// ----------------------------------------------------------------------------
+// IMsRdpExtendedSettings
+//
+const int DISPID_PROP_EXTENDED_PROPERTY            = 1;
+
+// ----------------------------------------------------------------------------
+// IMsRdpInputSink
+//
+const int DISPID_METHOD_SEND_MOUSE_BUTTON_EVENT = 1;
+const int DISPID_METHOD_SEND_MOUSE_MOVE_EVENT   = 2;
+const int DISPID_METHOD_SEND_MOUSE_WHEEL_EVENT  = 3;
+const int DISPID_METHOD_SEND_KEYBOARD_EVENT     = 4;
+const int DISPID_METHOD_SEND_SYNC_EVENT         = 5;
+const int DISPID_METHOD_BEGIN_TOUCH_FRAME       = 6;
+const int DISPID_METHOD_ADD_TOUCH_INPUT         = 7;
+const int DISPID_METHOD_END_TOUCH_FRAME         = 8;
+
+
+// ----------------------------------------------------------------------------
+// Events
+//
+const int DISPID_CONNECTING                   = 1;
+const int DISPID_CONNECTED                    = 2;
+const int DISPID_LOGINCOMPLETE                = 3;
+const int DISPID_DISCONNECTED                 = 4;
+const int DISPID_ENTERFULLSCREENMODE          = 5;
+const int DISPID_LEAVEFULLSCREENMODE          = 6;
+const int DISPID_CHANNELRECEIVEDDATA          = 7;
+const int DISPID_REQUESTGOFULLSCREEN          = 8;
+const int DISPID_REQUESTLEAVEFULLSCREEN       = 9;
+const int DISPID_FATALERROR                   = 10;
+const int DISPID_WARNING                      = 11;
+const int DISPID_REMOTEDESKTOPSIZECHANGE      = 12;
+const int DISPID_IDLETIMEOUTNOTIFICATION      = 13;
+const int DISPID_REQUESTCONTAINERMINIMIZE     = 14;
+const int DISPID_CONFIRMCLOSE                 = 15;
+const int DISPID_RECEVIEDTSPUBLICKEY          = 16;
+const int DISPID_RECEIVEDTSPUBLICKEY          = 16; // Correct spelling
+const int DISPID_AUTORECONNECTING             = 17;
+const int DISPID_INTERNALDIALOGDISPLAYED      = 18;
+const int DISPID_INTERNALDIALOGDISMISSED      = 19;
+const int DISPID_ONREMOTEPROGRAMRESULT        = 20;
+const int DISPID_ONREMOTEPROGRAMDISPLAYED     = 21;
+const int DISPID_LOGONERROR                   = 22;
+const int DISPID_FOCUSRELEASED                = 23;
+const int DISPID_USERNAMEACQUIRED             = 24;
+
+//
+// DISPID used by a private rdp encoder event. 
+// Don't add it to the source interface.
+// 
+const int DISPID_CHANNELWRITECOMPLETED        = 25;
+
+const int DISPID_MOUSEINPUTMODECHANGED        = 26;
+const int DISPID_ONSTATUSINFO                 = 27;
+const int DISPID_SERVICEMESSAGERECEIVED       = 28;
+const int DISPID_ONREMOTEWINDOWDISPLAYED      = 29;
+const int DISPID_CONNECTIONBARPULLDOWN        = 30;
+
+// Dispid used by a private rdp encoder event. Don't add it to the source 
+// interface
+const int DISPID_ONRECORDING_ERROR             = 31;
+
+const int DISPID_ONNETWORKSTATUSCHANGED        = 32;
+const int DISPID_AUTORECONNECTED               = 33;
+const int DISPID_AUTORECONNECTING2             = 34;
+const int DISPID_CONNECTIONBARDEVICES          = 35;
+
+//----------------------------------------------------------------------------
+//RemoteSessionAction type
+//
+typedef enum {
+    RemoteSessionActionCharms       = 0,
+    RemoteSessionActionAppbar       = 1,
+    RemoteSessionActionSnap         = 2,
+    RemoteSessionActionStartScreen  = 3,
+    RemoteSessionActionAppSwitch    = 4,
+    RemoteSessionActionActionCenter = 5
+} RemoteSessionActionType;
+
+
+// IMsTscNonScriptable interface
+// Do not update this interface!
+// (TSAC)
+//
+
+[
+    object,
+    uuid(c1e6743a-41c1-4a74-832a-0dd06c1c7a0e),
+    pointer_default(unique)
+]
+interface IMsTscNonScriptable : IUnknown
+{
+    [
+        propput,
+        id(DISPID_PROP_CLEARTEXTPASSWORD)
+    ]
+    HRESULT
+    ClearTextPassword(
+        [in] BSTR newClearTextPass
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_PORTABLEPASSWORD)
+    ]
+    HRESULT
+    PortablePassword(
+        [in] BSTR newPortablePassVal
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_PORTABLEPASSWORD)
+    ]
+    HRESULT PortablePassword(
+        [out, retval] BSTR* pPortablePass
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_PORTABLESALT)
+    ]
+    HRESULT
+    PortableSalt(
+        [in] BSTR newPortableSalt
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_PORTABLESALT)
+    ]
+    HRESULT PortableSalt(
+        [out, retval] BSTR* pPortableSalt
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_BINARYPASSWORD)
+    ]
+    HRESULT
+    BinaryPassword(
+        [in] BSTR newPassword
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_BINARYPASSWORD)
+    ]
+    HRESULT
+    BinaryPassword(
+        [out, retval] BSTR* pBinaryPassword
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_BINARYSALT)
+    ]
+    HRESULT
+    BinarySalt(
+        [in] BSTR newSalt
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_BINARYSALT)
+    ]
+    HRESULT
+    BinarySalt(
+        [out, retval] BSTR* pSalt
+        );
+
+    [
+        id(DISPID_METHOD_RESETPASSWORD)
+    ]
+    HRESULT
+    ResetPassword();
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable interface
+// Do not update this interface!
+// (Windows XP)
+//
+
+[
+    object,
+    uuid(2f079c4c-87b2-4afd-97ab-20cdb43038ae),
+    pointer_default(unique)
+]
+interface IMsRdpClientNonScriptable : IMsTscNonScriptable
+{
+    [
+        id(DISPID_METHOD_NOTIFY_REDIRECT_DEVICE_CHANGE)
+    ]
+    HRESULT
+    NotifyRedirectDeviceChange(
+        [in] WPARAM wParam,
+        [in] LPARAM lParam
+        );
+
+    [
+        id(DISPID_METHOD_SENDKEYS)
+    ]
+    HRESULT 
+    SendKeys(
+        [in] LONG  numKeys,
+        [in] VARIANT_BOOL* pbArrayKeyUp,
+        [in] LONG* plKeyData
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable2 interface
+// Do not update this interface!
+// (Windows Server 2003 SP1)
+//
+
+[
+    object,
+    uuid(17a5e535-4072-4fa4-af32-c8d0d47345e9),
+    pointer_default(unique)
+]
+interface IMsRdpClientNonScriptable2 : IMsRdpClientNonScriptable
+{
+    //
+    // Specify the window handle to use as the parent of any UI
+    // the control pops - added to allow the control to pop UI
+    // that is correctly modal w.r.t dialogs the shell may pop
+    // during the connection sequence
+    //
+    [
+        propput,
+        id(DISPID_PROP_UI_PARENT_WINDOW_HANDLE)
+    ]
+    HRESULT UIParentWindowHandle(
+        [in] HWND hwndUIParentWindowHandle
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_UI_PARENT_WINDOW_HANDLE)
+    ]
+    HRESULT UIParentWindowHandle(
+        [out, retval] HWND* phwndUIParentWindowHandle
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable3 interface
+// (Windows Vista)
+//
+interface IMsRdpDeviceCollection;
+interface IMsRdpDriveCollection;
+
+[
+    object,
+    uuid(b3378d90-0728-45c7-8ed7-b6159fb92219),
+    pointer_default(unique)
+]
+interface IMsRdpClientNonScriptable3 : IMsRdpClientNonScriptable2
+{
+    //
+    // Specify whether the redirection dialog warning dialog
+    // should be shown by the control.
+    //
+    [
+        propput,
+        id(DISPID_PROP_SHOW_RDRWARN_DLG)
+    ]
+    HRESULT
+    ShowRedirectionWarningDialog(
+        [in] VARIANT_BOOL fShowRdrDlg
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_SHOW_RDRWARN_DLG)
+    ]
+    HRESULT
+    ShowRedirectionWarningDialog(
+        [out, retval] VARIANT_BOOL* pfShowRdrDlg
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_PROMPT_FOR_CREDS)
+    ]
+    HRESULT
+    PromptForCredentials(
+        [in] VARIANT_BOOL fPrompt
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_PROMPT_FOR_CREDS)
+    ]
+    HRESULT
+    PromptForCredentials(
+        [out, retval] VARIANT_BOOL* pfPrompt
+        );
+    
+    [
+        propput,
+        id(DISPID_PROP_NEG_SEC_LAYER)
+    ]
+    HRESULT
+    NegotiateSecurityLayer(
+        [in] VARIANT_BOOL fNegotiate
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_NEG_SEC_LAYER)
+    ]
+    HRESULT
+    NegotiateSecurityLayer(
+        [out, retval] VARIANT_BOOL* pfNegotiate
+        );
+    
+    [
+        propput,
+        id(DISPID_PROP_ENABLE_CREDSSP_SUPPORT)
+    ]
+    HRESULT
+    EnableCredSspSupport(
+        [in] VARIANT_BOOL fEnableSupport
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ENABLE_CREDSSP_SUPPORT)
+    ]
+    HRESULT
+    EnableCredSspSupport(
+        [out, retval] VARIANT_BOOL* pfEnableSupport
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DYN_DRIVE_REDIRECT)
+    ]
+    HRESULT
+    RedirectDynamicDrives(
+        [in] VARIANT_BOOL fRedirectDynamicDrives
+        );
+    [
+        propget,
+        id(DISPID_PROP_DYN_DRIVE_REDIRECT)
+    ]
+    HRESULT
+    RedirectDynamicDrives(
+        [out, retval] VARIANT_BOOL *pfRedirectDynamicDrives
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DYN_DEVICE_REDIRECT)
+    ]
+    HRESULT
+    RedirectDynamicDevices(
+        [in] VARIANT_BOOL fRedirectDynamicDevices
+        );
+    [
+        propget,
+        id(DISPID_PROP_DYN_DEVICE_REDIRECT)
+    ]
+    HRESULT
+    RedirectDynamicDevices(
+        [out, retval] VARIANT_BOOL *pfRedirectDynamicDevices
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DEVICE_COLLECTION)
+    ]
+    HRESULT
+    DeviceCollection(
+        [out, retval] IMsRdpDeviceCollection** ppDeviceCollection
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DRIVE_COLLECTION)
+    ]
+    HRESULT
+    DriveCollection(
+        [out, retval] IMsRdpDriveCollection** ppDeviceCollection
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_WARN_ABOUT_SENDINGCREDS)
+    ]
+    HRESULT
+    WarnAboutSendingCredentials(
+        [in] VARIANT_BOOL fWarn
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_WARN_ABOUT_SENDINGCREDS)
+    ]
+    HRESULT
+    WarnAboutSendingCredentials(
+        [out, retval] VARIANT_BOOL *pfWarn
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_WARN_ABOUT_CLIPBOARD)
+    ]
+    HRESULT
+    WarnAboutClipboardRedirection(
+        [in] VARIANT_BOOL fWarn
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_WARN_ABOUT_CLIPBOARD)
+    ]
+    HRESULT
+    WarnAboutClipboardRedirection(
+        [out, retval] VARIANT_BOOL *pfWarn
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_CONNECTIONBAR_TEXT)
+    ]
+    HRESULT
+    ConnectionBarText(
+        [in] BSTR newVal
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_CONNECTIONBAR_TEXT)
+    ]
+    HRESULT
+    ConnectionBarText(
+        [out, retval] BSTR* pConnectionBarText
+        );
+
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable4 interface
+// (Windows Vista SP1 / Longhorn Server)
+//
+[
+    object,
+    uuid(f50fa8aa-1c7d-4f59-b15c-a90cacae1fcb),
+    pointer_default(unique)
+]
+interface IMsRdpClientNonScriptable4 : IMsRdpClientNonScriptable3
+{
+    typedef enum {
+        RedirectionWarningTypeDefault   = 0,    // warning dialog is non-publisher specific
+        RedirectionWarningTypeUnsigned,         // warning dialog is for unsigned files
+        RedirectionWarningTypeUnknown,          // warning dialog is for unknown publisher
+        RedirectionWarningTypeUser,             // warning dialog is for user's files
+        RedirectionWarningTypeThirdPartySigned, // warning dialog is for third-party cert signed files
+        RedirectionWarningTypeTrusted,          // warning dialog is not displayed since it's a trusted publisher
+        RedirectionWarningTypeMax = RedirectionWarningTypeTrusted
+    } RedirectionWarningType;
+    
+    //
+    // Controls the presence and appearance of the redirection warning dialog.
+    // The value RedirectionWarningTypeDefault (which is the default value of 
+    // this property) exerts no control over the dialog. The controlling
+    // property in this case isShowRedirectionWarningDialog in
+    // IMsRdpClientNonScriptable3
+    //
+    [
+        propput,
+        id(DISPID_PROP_RDRWARN_TYPE)
+    ]
+    HRESULT
+    RedirectionWarningType(
+        [in] RedirectionWarningType     wrnType
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_RDRWARN_TYPE)
+    ]
+    HRESULT
+    RedirectionWarningType(
+        [out, retval] RedirectionWarningType*   pWrnType
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_SHELL_MARK_RDPSECURE)
+    ]
+    HRESULT
+    MarkRdpSettingsSecure(
+        [in] VARIANT_BOOL fRdpSecure
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_SHELL_MARK_RDPSECURE)
+    ]
+    HRESULT
+    MarkRdpSettingsSecure(
+        [out, retval] VARIANT_BOOL* pfRdpSecure
+        );
+
+    //
+    // Sets the publisher certificate chain as a VT_BYREF variant contaning a PCCERT_CHAIN_CONTEXT. 
+    //
+    [
+        propput,
+        id(DISPID_PROP_PUBLISHER_CERTIFICATE_CHAIN)
+    ]
+    HRESULT
+    PublisherCertificateChain(
+        [in] VARIANT*    pVarCert
+        );
+
+    //
+    // Returns the publisher certificate as a a VT_BYREF variant contaning a PCCERT_CHAIN_CONTEXT. 
+    //
+    [
+        propget,
+        id(DISPID_PROP_PUBLISHER_CERTIFICATE_CHAIN)
+    ]
+    HRESULT
+    PublisherCertificateChain(
+        [out, retval] VARIANT*       pVarCert
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_WARN_ABOUT_PRINTERS)
+    ]
+    HRESULT
+    WarnAboutPrinterRedirection(
+        [in] VARIANT_BOOL fWarn
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_WARN_ABOUT_PRINTERS)
+    ]
+    HRESULT
+    WarnAboutPrinterRedirection(
+        [out, retval] VARIANT_BOOL *pfWarn
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ALLOW_CRED_SAVING)
+    ]
+    HRESULT
+    AllowCredentialSaving(
+        [in] VARIANT_BOOL fAllowSave
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ALLOW_CRED_SAVING)
+    ]
+    HRESULT
+    AllowCredentialSaving(
+        [out, retval] VARIANT_BOOL* pfAllowSave
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_PROMPT_FOR_CREDS_ON_CLIENT)
+    ]
+    HRESULT
+    PromptForCredsOnClient(
+        [in] VARIANT_BOOL fPromptForCredsOnClient
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_PROMPT_FOR_CREDS_ON_CLIENT)
+    ]
+    HRESULT
+    PromptForCredsOnClient(
+        [out, retval] VARIANT_BOOL* pfPromptForCredsOnClient
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_LAUNCHED_VIA_CLIENTSHELL_IFACE)
+    ]
+    HRESULT
+    LaunchedViaClientShellInterface(
+        [in] VARIANT_BOOL fLaunchedViaClientShellInterface
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_LAUNCHED_VIA_CLIENTSHELL_IFACE)
+    ]
+    HRESULT
+    LaunchedViaClientShellInterface(
+        [out, retval] VARIANT_BOOL* pfLaunchedViaClientShellInterface
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRUSTED_ZONE_SITE)
+    ]
+    HRESULT
+    TrustedZoneSite(
+        [in] VARIANT_BOOL fIsTrustedZone
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRUSTED_ZONE_SITE)
+    ]
+    HRESULT
+    TrustedZoneSite(
+        [out, retval] VARIANT_BOOL* pfIsTrustedZone
+        );
+}
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientNonScriptable5 interface
+// (Windows 7)
+//
+[
+    object,
+    uuid(4f6996d5-d7b1-412c-b0ff-063718566907),
+    pointer_default(unique)
+]
+interface IMsRdpClientNonScriptable5 : IMsRdpClientNonScriptable4
+{
+    [
+        propput,
+        id(DISPID_PROP_USE_MULTIMON)
+    ]
+    HRESULT
+    UseMultimon(
+        [in] VARIANT_BOOL fUseMultimon
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_USE_MULTIMON)
+    ]
+    HRESULT
+    UseMultimon(
+        [out, retval] VARIANT_BOOL* pfUseMultimon
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_REMOTE_MONITOR_COUNT)
+    ]
+    HRESULT
+    RemoteMonitorCount(
+        [out, retval] ULONG* pcRemoteMonitors
+        );
+
+    [
+        id(DISPID_METHOD_MONITOR_BOUNDING_BOX)
+    ]
+    HRESULT 
+    GetRemoteMonitorsBoundingBox(
+        [out] LONG* pLeft,
+        [out] LONG* pTop,
+        [out] LONG* pRight,
+        [out] LONG* pBottom
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_REMOTE_MONITORS_MATCH_LOCAL)
+    ]
+    HRESULT 
+    RemoteMonitorLayoutMatchesLocal(
+        [out, retval] VARIANT_BOOL* pfRemoteMatchesLocal
+        );
+    
+    [
+        propput,
+        id(DISPID_PROP_DISABLE_CONNECTION_BAR)
+    ]
+    HRESULT
+    DisableConnectionBar(
+        [in] VARIANT_BOOL fDisableConnectionBar
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_DISABLE_REMOTEAPPS_CAPSCHECK)
+    ]
+    HRESULT 
+    DisableRemoteAppCapsCheck(
+        [in] VARIANT_BOOL fDisableRemoteAppCapsCheck
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_DISABLE_REMOTEAPPS_CAPSCHECK)
+    ]
+    HRESULT 
+    DisableRemoteAppCapsCheck(
+        [out, retval] VARIANT_BOOL* pfDisableRemoteAppCapsCheck
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_WARN_ABOUT_DIRECTX)
+    ]
+    HRESULT
+    WarnAboutDirectXRedirection(
+        [in] VARIANT_BOOL fWarn
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_WARN_ABOUT_DIRECTX)
+    ]
+    HRESULT
+    WarnAboutDirectXRedirection(
+        [out, retval] VARIANT_BOOL *pfWarn
+        );
+
+    [
+        propput, 
+        id(DISPID_ALLOW_PROMPTING_FOR_CREDS)
+    ]
+    HRESULT
+    AllowPromptingForCredentials(
+        [in] VARIANT_BOOL fAllow
+        );
+
+    [
+        propget,
+        id(DISPID_ALLOW_PROMPTING_FOR_CREDS)
+    ]
+    HRESULT
+    AllowPromptingForCredentials(
+        [out, retval] VARIANT_BOOL *pfAllow
+        );
+}
+
+// ----------------------------------------------------------------------------
+// IMsTscSecuredSettings interface
+// Do not update this interface!
+// (TSAC)
+//
+
+[
+    object,
+    uuid(c9d65442-a0f9-45b2-8f73-d61d2db8cbb6),
+    dual,
+    pointer_default(unique)
+]
+interface IMsTscSecuredSettings : IDispatch
+{
+    [
+        propput,
+        id(DISPID_PROP_SECURED_STARTPROGRAM)
+    ]
+    HRESULT
+    StartProgram(
+        [in] BSTR newVal
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_SECURED_STARTPROGRAM)
+    ]
+    HRESULT
+    StartProgram(
+        [out, retval] BSTR* pStartProgram
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_SECURED_WORKDIR)
+    ]
+    HRESULT
+    WorkDir(
+        [in] BSTR  newVal
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_SECURED_WORKDIR)
+    ]
+    HRESULT
+    WorkDir(
+        [out, retval] BSTR* pWorkDir
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_SECURED_FULLSCREEN)
+    ]
+    HRESULT
+    FullScreen(
+        [in] BOOL fFullScreen
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_SECURED_FULLSCREEN)
+    ]
+    HRESULT
+    FullScreen(
+        [out, retval] BOOL* pfFullScreen
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientSecuredSettings
+// Do not update this interface!
+// (Windows XP)
+//
+
+[
+    object,
+    uuid(605befcf-39c1-45cc-a811-068fb7be346d),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientSecuredSettings : IMsTscSecuredSettings
+{
+    [
+        propput,
+        id(DISPID_PROP_SECURED_KEYBOARD_HOOKING_MODE)
+    ]
+    HRESULT
+    KeyboardHookMode(
+        [in] LONG  keyboardHookMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_SECURED_KEYBOARD_HOOKING_MODE)
+    ]
+    HRESULT KeyboardHookMode(
+        [out, retval] LONG* pkeyboardHookMode
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_SECURED_AUDIO_REDIRECTION_MODE)
+    ]
+    HRESULT
+    AudioRedirectionMode(
+        [in] LONG audioRedirectionMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_SECURED_AUDIO_REDIRECTION_MODE)
+    ]
+    HRESULT
+    AudioRedirectionMode(
+        [out, retval] LONG* pAudioRedirectionMode
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientSecuredSettings2
+// (Windows 7)
+//
+
+[
+    object,
+    uuid(25f2ce20-8b1d-4971-a7cd-549dae201fc0),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientSecuredSettings2 : IMsRdpClientSecuredSettings
+{
+    [
+        propget,
+        id(DISPID_PROP_SECURED_PCB)
+    ]
+    HRESULT
+    PCB(
+        [out, retval] BSTR* bstrPCB
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_SECURED_PCB)
+    ]
+    HRESULT
+    PCB(
+        [in] BSTR bstrPCB
+        );    
+};
+
+// ----------------------------------------------------------------------------
+// IMsTscDebug interface
+//
+
+[
+    object,
+    uuid(209d0eb9-6254-47b1-9033-a98dae55bb27),
+    hidden,
+    dual,
+    pointer_default(unique)
+]
+interface IMsTscDebug : IDispatch
+{
+    [
+        propput,
+        id(DISPID_PROP_DBG_HATCH_BMP_PDU)
+    ]
+    HRESULT
+    HatchBitmapPDU(
+        [in] BOOL hatchBitmapPDU
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_HATCH_BMP_PDU)
+    ]
+    HRESULT
+    HatchBitmapPDU(
+        [out, retval] BOOL* phatchBitmapPDU
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_HATCH_SSB_ORDER)
+    ]
+    HRESULT
+    HatchSSBOrder(
+        [in] BOOL hatchSSBOrder
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_HATCH_SSB_ORDER)
+    ]
+    HRESULT
+    HatchSSBOrder(
+        [out, retval] BOOL* phatchSSBOrder
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_HATCH_MEMBLT_ORDER)
+    ]
+    HRESULT
+    HatchMembltOrder(
+        [in] BOOL hatchMembltOrder
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_HATCH_MEMBLT_ORDER)
+    ]
+    HRESULT
+    HatchMembltOrder(
+        [out, retval] BOOL*  phatchMembltOrder
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_HATCH_INDEX_PDU)
+    ]
+    HRESULT
+    HatchIndexPDU(
+        [in] BOOL hatchIndexPDU
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_HATCH_INDEX_PDU)
+    ]
+    HRESULT
+    HatchIndexPDU(
+        [out, retval] BOOL*  phatchIndexPDU
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_LABEL_MEMBLT)
+    ]
+    HRESULT
+    LabelMemblt(
+        [in] BOOL labelMemblt
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_LABEL_MEMBLT)
+    ]
+    HRESULT
+    LabelMemblt(
+        [out, retval] BOOL*  plabelMemblt
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_BMP_CACHE_MON)
+    ]
+    HRESULT
+    BitmapCacheMonitor(
+        [in] BOOL bitmapCacheMonitor
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_BMP_CACHE_MON)
+    ]
+    HRESULT
+    BitmapCacheMonitor  (
+        [out, retval] BOOL* pbitmapCacheMonitor
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_MALLOC_FAILURES)
+    ]
+    HRESULT
+    MallocFailuresPercent(
+        [in] LONG mallocFailures
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_MALLOC_FAILURES)
+    ]
+    HRESULT
+    MallocFailuresPercent(
+        [out, retval] LONG*  pmallocFailuresPercent
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_MALLOC_HUGE_FAILURES)
+    ]
+    HRESULT
+    MallocHugeFailuresPercent(
+        [in] LONG mallocHugeFailures
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_MALLOC_HUGE_FAILURES)
+    ]
+    HRESULT
+    MallocHugeFailuresPercent  (
+        [out, retval] LONG* pmallocHugeFailuresPercent
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_NET_THRUPUT)
+    ]
+    HRESULT
+    NetThroughput(
+        [in] LONG netThroughput
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_NET_THRUPUT)
+    ]
+    HRESULT
+    NetThroughput(
+        [out, retval] LONG* netThroughput
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_CLX_CMDLINE)
+    ]
+    HRESULT
+    CLXCmdLine(
+        [in] BSTR  CLXCmdLine
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_CLX_CMDLINE)
+    ]
+    HRESULT CLXCmdLine(
+        [out, retval] BSTR* pCLXCmdLine
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_CLX_CLXDLL)
+    ]
+    HRESULT CLXDll(
+        [in] BSTR CLXDll
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_CLX_CLXDLL)
+    ]
+    HRESULT CLXDll(
+        [out, retval] BSTR*  pCLXDll
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_VIS),
+    ]
+    HRESULT
+    RemoteProgramsHatchVisibleRegion(
+        [in] BOOL cbHatch
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_VIS)
+    ]
+    HRESULT
+    RemoteProgramsHatchVisibleRegion(
+        [out, retval] BOOL* pcbHatch
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_VIS_NODATA)
+    ]
+    HRESULT
+        RemoteProgramsHatchVisibleNoDataRegion(
+        [in] BOOL cbHatch
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_VIS_NODATA)
+    ]
+    HRESULT
+        RemoteProgramsHatchVisibleNoDataRegion(
+        [out, retval] BOOL* pcbHatch
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_NONVIS)
+    ]
+    HRESULT
+        RemoteProgramsHatchNonVisibleRegion(
+        [in] BOOL cbHatch
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_NONVIS)
+    ]
+    HRESULT RemoteProgramsHatchNonVisibleRegion(
+        [out, retval] BOOL* pcbHatch
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_WINDOW)
+    ]
+    HRESULT RemoteProgramsHatchWindow(
+        [in] BOOL cbHatch
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_HATCH_WINDOW)
+    ]
+    HRESULT RemoteProgramsHatchWindow(
+        [out, retval] BOOL* pcbHatch
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_STAYCONNECTED_ONBADCAPS)
+    ]
+    HRESULT RemoteProgramsStayConnectOnBadCaps(
+        [in] BOOL cbStayConnected
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_REMOTEPROGRAM_STAYCONNECTED_ONBADCAPS)
+    ]
+    HRESULT RemoteProgramsStayConnectOnBadCaps(
+        [out, retval] BOOL* pcbStayConnected
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DBG_CONTROL_TYPE)
+    ]
+    HRESULT ControlType(
+        [out, retval] UINT* pControlType
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DISABLE_GFX_DECODING)
+    ]
+    HRESULT 
+    DecodeGfx(
+        [in] VARIANT_BOOL fDisableDecodeOfGfx
+        );     
+};
+
+// ----------------------------------------------------------------------------
+// ITSRemoteProgram interface
+// (Windows Vista)
+//
+
+[
+    object,
+    uuid(FDD029F9-467A-4c49-8529-64B521DBD1B4),
+    hidden,
+    dual,
+    pointer_default(unique)
+]
+interface ITSRemoteProgram : IDispatch
+{
+    [
+        propput,
+        id(DISPID_PROP_REMOTEPROGRAM_REMOTEPROGRAMMODE)
+    ]
+    HRESULT
+    RemoteProgramMode(
+      [in] VARIANT_BOOL  vboolRemoteProgramMode
+      );
+
+    [
+        propget,
+        id(DISPID_PROP_REMOTEPROGRAM_REMOTEPROGRAMMODE)
+    ]
+    HRESULT
+    RemoteProgramMode(
+        [out, retval] VARIANT_BOOL* pvboolRemoteProgramMode
+        );
+
+    [
+        id(DISPID_REMOTEPROGRAM_SERVER_START_PROGRAM)
+    ]
+    HRESULT
+    ServerStartProgram(
+        [in]  BSTR          bstrExecutablePath,
+        [in]  BSTR          bstrFilePath,
+        [in]  BSTR          bstrWorkingDirectory,
+        [in]  VARIANT_BOOL  vbExpandEnvVarInWorkingDirectoryOnServer,
+        [in]  BSTR          bstrArguments,
+        [in]  VARIANT_BOOL  vbExpandEnvVarInArgumentsOnServer        
+        );
+};
+
+// ----------------------------------------------------------------------------
+// ITSRemoteProgram2 interface
+// (Win7)
+//
+
+[
+    object,
+    uuid(92C38A7D-241A-418c-9936-099872C9AF20),
+    hidden,
+    dual,
+    pointer_default(unique)
+]
+interface ITSRemoteProgram2 : ITSRemoteProgram
+{
+    [
+        propput,
+        id(DISPID_PROP_REMOTEPROGRAM_REMOTE_APPLICATIONNAME)
+    ]
+    HRESULT
+    RemoteApplicationName(
+        [in] BSTR remoteApplicationName
+      );
+
+    [
+        propput,
+        id(DISPID_PROP_REMOTEPROGRAM_REMOTE_APPLICATION_PROGRAM)
+    ]
+    HRESULT
+    RemoteApplicationProgram(
+        [in] BSTR remoteApplicationProgram
+      );
+
+    [
+        propput,
+        id(DISPID_PROP_REMOTEPROGRAM_REMOTE_APPLICATION_ARGS)
+    ]
+    HRESULT
+    RemoteApplicationArgs(
+        [in] BSTR remoteApplicationArgs
+      );
+}
+
+// ----------------------------------------------------------------------------
+// IMsRdpDevice
+// (Windows Vista)
+
+[
+    object,
+    uuid(d28b5458-f694-47a8-8e61-40356a767e46),
+    pointer_default(unique)
+]
+interface IMsRdpDrive : IUnknown
+{
+    [
+        propget,
+        id(DISPID_PROP_GET_DRIVE_NAME)
+    ]
+    HRESULT
+    Name(
+        [out, retval] BSTR* pName
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_DRIVE_REDIR_STATE)
+    ]
+    HRESULT
+    RedirectionState(
+        [in] VARIANT_BOOL vboolRedirState
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DRIVE_REDIR_STATE)
+    ]
+    HRESULT
+    RedirectionState(
+        [out, retval] VARIANT_BOOL* pvboolRedirState
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpDriveV2
+// (Windows 7 SP1)
+
+[
+    object,
+    uuid(3e05417c-2721-4008-9d80-4edf1539c817),
+    pointer_default(unique)
+]
+interface IMsRdpDriveV2 : IMsRdpDrive
+{
+    [
+        propget,
+        id(DISPID_PROP_GET_DRIVE_LETTER_INDEX)
+    ]
+    HRESULT
+    DriveLetterIndex(
+        [out, retval] ULONG *pDriveLetterIndex
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpDriveCollection
+// (Windows Vista)
+
+
+[
+    object,
+    uuid(7ff17599-da2c-4677-ad35-f60c04fe1585),
+//    dual,
+    pointer_default(unique)
+]
+interface IMsRdpDriveCollection : IUnknown
+{
+
+    [
+        id(DISPID_PROP_RESCANDRIVES)
+    ]
+    HRESULT 
+    RescanDrives(VARIANT_BOOL vboolDynRedir);
+
+
+    [
+        propget,
+        id(DISPID_PROP_DRIVEBYINDEX)
+    ]
+    HRESULT 
+    DriveByIndex(
+        [in]            ULONG index,
+        [out, retval]   IMsRdpDrive** ppDevice
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_GET_DRIVECOUNT)
+    ]
+    HRESULT 
+    DriveCount(
+        [out, retval] ULONG *pDriveCount
+        );
+
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpDevice
+// (Windows Vista)
+[
+    object,
+    uuid(60c3b9c8-9e92-4f5e-a3e7-604a912093ea),
+    pointer_default(unique)
+]
+interface IMsRdpDevice : IUnknown
+{
+    [
+        propget,
+        id(DISPID_PROP_GET_DEV_ID)
+    ]
+    HRESULT
+    DeviceInstanceId(
+        [out, retval] BSTR* pDevInstanceId
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_GET_FRIENDLY_NAME)
+    ]
+    HRESULT
+    FriendlyName(
+      [out, retval] BSTR* pFriendlyName
+      );
+
+    [
+        propget,
+        id(DISPID_PROP_GET_DEVICE_DESC)
+    ]
+    HRESULT
+    DeviceDescription(
+      [out, retval] BSTR* pDeviceDescription
+      );
+
+    [
+        propput,
+        id(DISPID_PROP_REDIR_STATE)
+    ]
+    HRESULT
+    RedirectionState(
+        [in] VARIANT_BOOL vboolRedirState
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_REDIR_STATE)
+    ]
+    HRESULT
+    RedirectionState(
+        [out, retval] VARIANT_BOOL* pvboolRedirState
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpDeviceV2
+// (Windows 7 SP1)
+[
+    object,
+    uuid(5fb94466-7661-42a8-98b7-01904c11668f),
+    pointer_default(unique)
+]
+interface IMsRdpDeviceV2 : IMsRdpDevice
+{
+    [
+        propget,
+        id(DISPID_PROP_GET_DEVICE_TEXT)
+    ]
+    HRESULT
+    DeviceText(
+      [out, retval] BSTR* pDeviceText
+      );
+
+
+    [
+        propget,
+        id(DISPID_PROP_USB)
+    ]
+    HRESULT
+    IsUSBDevice(
+        [out, retval] VARIANT_BOOL* pvboolUSBDevice
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_COMPOSITE)
+    ]
+    HRESULT
+    IsCompositeDevice(
+        [out, retval] VARIANT_BOOL* pvboolCompositeDevice
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_GET_DRIVE_LETTER_BITMAP)
+    ]
+    HRESULT
+    DriveLetterBitmap(
+        [out, retval] ULONG* pDriveLetterBitmap
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_CM_DEVINST)
+    ]
+    HRESULT
+    CmDeviceInstance(
+        [out, retval] DWORD * pCmDeviceInstance
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_OPTIONAL)
+    ]
+    HRESULT
+    IsOptionalDevice(
+        [out, retval] VARIANT_BOOL* pvboolOptionalDevice
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_CM_CLASS_GUID)
+    ]
+    HRESULT
+    CmClassGuid(
+        [out, retval] BSTR* pCmClassGuid
+        );
+
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpDeviceCollection
+// (Windows Vista)
+
+
+[
+    object,
+    uuid(56540617-d281-488c-8738-6a8fdf64a118),
+    pointer_default(unique)
+]
+interface IMsRdpDeviceCollection : IUnknown
+{
+    [
+        id(DISPID_PROP_RESCAN)
+    ]
+    HRESULT 
+    RescanDevices(
+        [in] VARIANT_BOOL vboolDynRedir
+        );
+
+
+    [
+        propget,
+        id(DISPID_PROP_DEVBYINDEX)
+    ]
+    HRESULT 
+    DeviceByIndex(
+        [in]            ULONG index,
+        [out, retval]   IMsRdpDevice** ppDevice
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_DEVBYID)
+    ]
+    HRESULT
+    DeviceById(
+        [in]            BSTR devInstanceId,
+        [out, retval]   IMsRdpDevice** ppDevice
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_GET_DEVICECOUNT)
+    ]
+    HRESULT 
+    DeviceCount(
+        [out, retval] ULONG *pDeviceCount
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpDeviceCollection2
+// (Windows 8)
+
+
+[
+    object,
+    uuid(e0e5d68a-f2e7-4350-adfe-ac0e08d74de0),
+    pointer_default(unique)
+]
+interface IMsRdpDeviceCollection2 : IMsRdpDeviceCollection
+{
+    [
+        id(DISPID_PROP_ADDDEVICEBYINSTANCEID),
+        helpstring("Adds non listed device")
+    ]
+    HRESULT 
+    AddDeviceByInstanceId(
+        [in] RedirectDeviceType Type,
+        [in] BSTR InstanceId
+        );
+
+    [
+        id(DISPID_PROP_REDIRECTNOW),
+        helpstring("Force redirect USB devices while connected")
+    ]
+    HRESULT 
+    RedirectNow(
+        [in] RedirectDeviceType Type
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings
+// (Windows Vista)
+//
+
+[
+    object,
+    uuid(720298C0-A099-46f5-9F82-96921BAE4701),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientTransportSettings : IDispatch
+{
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYHOSTNAME)
+    ]
+    HRESULT
+    GatewayHostname(
+        [in] BSTR newVal
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYHOSTNAME)
+    ]
+    HRESULT
+    GatewayHostname (
+        [out, retval] BSTR* pProxyHostname
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYUSAGEMETHOD)
+    ]
+    HRESULT
+    GatewayUsageMethod(
+        [in] ULONG ulProxyMethod
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYUSAGEMETHOD)
+    ]
+    HRESULT
+    GatewayUsageMethod(
+        [out, retval] ULONG* pulProxyUsageMethod
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYPROFILEUSAGEMETHOD)
+    ]
+    HRESULT
+    GatewayProfileUsageMethod(
+        [in] ULONG ulProxyProfileMethod
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYPROFILEUSAGEMETHOD)
+    ]
+    HRESULT
+    GatewayProfileUsageMethod(
+        [out, retval] ULONG* pulProxyProfileUsageMethod
+        );    
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSSOURCE)
+    ]
+    HRESULT
+    GatewayCredsSource(
+        [in] ULONG ulProxyCredsSource
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSSOURCE)
+    ]
+    HRESULT
+    GatewayCredsSource(
+        [out, retval] ULONG* pulProxyCredsSource
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYUSERSELECTEDCREDSSOURCE)
+    ]
+    HRESULT
+    GatewayUserSelectedCredsSource(
+        [in] ULONG ulProxyCredsSource
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYUSERSELECTEDCREDSSOURCE)
+    ]
+    HRESULT
+    GatewayUserSelectedCredsSource(
+        [out, retval] ULONG* pulProxyCredsSource
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYISSUPPORTED)
+    ]
+    HRESULT
+    GatewayIsSupported(
+        [out, retval] BOOL* pfProxyIsSupported
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYDEFAULTUSAGEMETHOD)
+    ]
+    HRESULT
+    GatewayDefaultUsageMethod(
+        [out, retval] ULONG* pulProxyDefaultUsageMethod
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings2
+// (Windows Vista SP1 / Longhorn Server)
+//
+[
+    object,
+    uuid(67341688-D606-4c73-A5D2-2E0489009319),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientTransportSettings2 : IMsRdpClientTransportSettings
+{
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSHARING)
+    ]
+    HRESULT
+    GatewayCredSharing(
+        [in] ULONG ulProxyCredSharing
+        );
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSHARING)
+    ]
+    HRESULT
+    GatewayCredSharing(
+        [out, retval] ULONG* pulProxyCredSharing
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYREQUIREPREAUTH)
+    ]
+    HRESULT
+    GatewayPreAuthRequirement(
+        [in] ULONG ulProxyPreAuthRequirement
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYREQUIREPREAUTH)
+    ]
+    HRESULT
+    GatewayPreAuthRequirement(
+        [out, retval] ULONG* pulProxyPreAuthRequirement
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYPREAUTHSERVERADDR)
+    ]
+    HRESULT
+    GatewayPreAuthServerAddr(
+        [in] BSTR bstrProxyPreAuthServerAddr
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYPREAUTHSERVERADDR)
+    ]
+    HRESULT
+    GatewayPreAuthServerAddr(
+        [out, retval] BSTR* pbstrProxyPreAuthServerAddr
+        );
+        
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYSUPPORTURL)
+    ]
+    HRESULT
+    GatewaySupportUrl(
+        [in] BSTR bstrProxySupportUrl
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYSUPPORTURL)
+    ]
+    HRESULT
+    GatewaySupportUrl(
+        [out, retval] BSTR* pbstrProxySupportUrl
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYOTPCOOKIE)
+    ]
+    HRESULT
+    GatewayEncryptedOtpCookie(
+        [in] BSTR bstrEncryptedOtpCookie
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYOTPCOOKIE)
+    ]
+    HRESULT
+    GatewayEncryptedOtpCookie(
+        [out, retval] BSTR* pbstrEncryptedOtpCookie
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYOTPCOOKIESIZE)
+    ]
+    HRESULT
+    GatewayEncryptedOtpCookieSize(
+        [in] ULONG ulEncryptedOtpCookieSize
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYOTPCOOKIESIZE)
+    ]
+    HRESULT
+    GatewayEncryptedOtpCookieSize(
+        [out, retval] ULONG* pulEncryptedOtpCookieSize
+        );   
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYUSERNAME)
+    ]
+    HRESULT
+    GatewayUsername(
+        [in] BSTR proxyUsername
+        );
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYUSERNAME)
+    ]
+    HRESULT
+    GatewayUsername(
+        [out, retval] BSTR* pProxyUsername
+        );
+        
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYDOMAIN)
+    ]
+    HRESULT
+    GatewayDomain(
+        [in] BSTR proxyDomain
+        );
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYDOMAIN)
+    ]
+    HRESULT
+    GatewayDomain (
+        [out, retval] BSTR* pProxyDomain
+        );
+        
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYPASSWORD)
+    ]
+    HRESULT
+    GatewayPassword(
+        [in] BSTR proxyPassword
+        );     
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings3
+// (Windows 7)
+//
+[
+    object,
+    uuid(3D5B21AC-748D-41DE-8F30-E15169586BD4),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientTransportSettings3 : IMsRdpClientTransportSettings2
+{
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSOURCECOOKIE)
+    ]
+    HRESULT
+    GatewayCredSourceCookie(
+        [in] ULONG ulProxyCredSourceCookie
+        );
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYCREDSOURCECOOKIE)
+    ]
+    HRESULT
+    GatewayCredSourceCookie(
+        [out, retval] ULONG* pulProxyCredSourceCookie
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIESERVERADDR)
+    ]
+    HRESULT
+    GatewayAuthCookieServerAddr(
+        [in] BSTR bstrProxyAuthCookieServerAddr
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIESERVERADDR)
+    ]
+    HRESULT
+    GatewayAuthCookieServerAddr(
+        [out, retval] BSTR* pbstrProxyAuthCookieServerAddr
+        );
+        
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIE)
+    ]
+    HRESULT
+    GatewayEncryptedAuthCookie(
+        [in] BSTR bstrEncryptedAuthCookie
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIE)
+    ]
+    HRESULT
+    GatewayEncryptedAuthCookie(
+        [out, retval] BSTR* pbstrEncryptedAuthCookie
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIESIZE)
+    ]
+    HRESULT
+    GatewayEncryptedAuthCookieSize(
+        [in] ULONG ulEncryptedAuthCookieSize
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHCOOKIESIZE)
+    ]
+    HRESULT
+    GatewayEncryptedAuthCookieSize(
+        [out, retval] ULONG* pulEncryptedAuthCookieSize
+        );        
+
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHLOGINPAGE)
+    ]
+    HRESULT
+    GatewayAuthLoginPage(
+        [in] BSTR bstrProxyAuthLoginPage
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYAUTHLOGINPAGE)
+    ]
+    HRESULT
+    GatewayAuthLoginPage(
+        [out, retval] BSTR* pbstrProxyAuthLoginPage
+        );
+    
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientTransportSettings4
+// ( Windows Blue)
+//
+[
+    object,
+    uuid(011C3236-4D81-4515-9143-067AB630D299),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientTransportSettings4 : IMsRdpClientTransportSettings3
+{
+    [
+        propput,
+        id(DISPID_PROP_TRANSPORT_HTTP_PROXYBROKERINGTYPE)
+    ]
+    HRESULT
+    GatewayBrokeringType(
+        [in] ULONG ulProxyBrokeringType
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientShell
+// (Windows Vista)
+//
+
+[
+    object,
+    uuid(d012ae6d-c19a-4bfe-b367-201f8911f134),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientShell: IDispatch
+{
+    [
+        id(DISPID_METHOD_CLIENTSHELL_LAUNCH)
+    ]
+    HRESULT
+    Launch();
+
+    [
+        propput,
+        id(DISPID_PROP_CLIENTSHELL_RDPFILE_CONTENTS)
+    ]
+    HRESULT
+    RdpFileContents(
+        [in] BSTR newVal
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_CLIENTSHELL_RDPFILE_CONTENTS)
+    ]
+    HRESULT
+    RdpFileContents(
+        [out, retval] BSTR* pszRdpFile
+        );
+
+    [
+        id(DISPID_METHOD_CLIENTSHELL_SET_RDPPROPERTY)
+    ]
+    HRESULT
+    SetRdpProperty(
+        [in] BSTR szProperty,
+        [in] VARIANT Value
+        );
+
+    [
+        id(DISPID_METHOD_CLIENTSHELL_GET_RDPPROPERTY)
+    ]
+    HRESULT
+    GetRdpProperty(
+        [in] BSTR szProperty,
+        [out, retval] VARIANT *pValue
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_CLIENTSHELL_REMOTE_APP_CLIENT_INSTALLED)
+    ]
+    HRESULT
+    IsRemoteProgramClientInstalled(
+        [out, retval] VARIANT_BOOL* pbClientInstalled
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_CLIENTSHELL_PUBLIC_MODE)
+    ]
+    HRESULT
+    PublicMode(
+        [in] VARIANT_BOOL fPublicMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_CLIENTSHELL_PUBLIC_MODE)
+    ]
+    HRESULT
+    PublicMode(
+        [out, retval] VARIANT_BOOL* pfPublicMode
+        );
+
+    [
+        id(DISPID_METHOD_CLIENTSHELL_SHOW_TRUSTED_SITES_DLG)
+    ]
+    HRESULT
+    ShowTrustedSitesManagementDialog();
+};
+
+// IMsTscAdvancedSettings interface
+// Do not update this interface!
+// (TSAC)
+//
+
+[
+    object,
+    uuid(809945cc-4b3b-4a92-a6b0-dbf9b5f2ef2d),
+    dual,
+    pointer_default(unique)
+]
+interface IMsTscAdvancedSettings : IDispatch
+{
+    [
+        propput, 
+        id(DISPID_PROP_ADV_COMPRESS)
+    ]
+    HRESULT 
+    Compress(
+        [in] LONG compress
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_COMPRESS)
+    ]
+    HRESULT 
+    Compress(
+        [out, retval] LONG* pcompress
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BITMAPPERISTENCE)
+    ]
+    HRESULT 
+    BitmapPeristence(
+        [in] LONG bitmapPeristence
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BITMAPPERISTENCE)
+    ]
+    HRESULT 
+    BitmapPeristence(
+        [out, retval] LONG*  pbitmapPeristence
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ALLOWBACKGROUNDINPUT)
+    ]
+    HRESULT 
+    allowBackgroundInput(
+        [in] LONG  allowBackgroundInput
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_ALLOWBACKGROUNDINPUT)
+    ]
+    HRESULT 
+    allowBackgroundInput(
+        [out, retval] LONG*  pallowBackgroundInput
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_KEYBOARDLAYOUTSTR)
+    ]
+    HRESULT 
+    KeyBoardLayoutStr(
+        [in] BSTR KeyBoardLayoutStr
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_PLUGINDLLS)
+    ]
+    HRESULT 
+    PluginDlls(
+        [in] BSTR  PluginDlls
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ICONFILE)
+    ]
+    HRESULT 
+    IconFile(
+        [in] BSTR IconFile
+        );
+    
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ICONINDEX)
+    ]
+    HRESULT 
+    IconIndex(
+        [in] LONG IconIndex
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CONTAINER_FULLSCREEN)
+    ]
+    HRESULT 
+    ContainerHandledFullScreen(
+        [in] BOOL ContainerHandledFullScreen
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_CONTAINER_FULLSCREEN)
+    ]
+    HRESULT ContainerHandledFullScreen(
+        [out, retval] BOOL*  pContainerHandledFullScreen
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_DISABLE_RDPDR)
+    ]
+    HRESULT 
+    DisableRdpdr(
+        [in] BOOL DisableRdpdr
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_DISABLE_RDPDR)
+    ]
+    HRESULT DisableRdpdr(
+        [out, retval] BOOL* pDisableRdpdr
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings interface
+// Do not update this interface!
+// (Windows XP)
+//
+
+[
+    object,
+    uuid(3c65b4ab-12b3-465b-acd4-b8dad3bff9e2),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings : IMsTscAdvancedSettings
+{
+    //
+    // Advanced properties
+    //
+    [
+        propput, 
+        id(DISPID_PROP_ADV_SMOOTHSCROLL)
+    ]
+    HRESULT 
+    SmoothScroll(
+        [in] LONG smoothScroll
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_SMOOTHSCROLL)
+    ]
+    HRESULT 
+    SmoothScroll(
+        [out, retval] LONG* psmoothScroll
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ACCELERATORPASSTHROUGH)
+    ]
+    HRESULT 
+    AcceleratorPassthrough(
+        [in] LONG acceleratorPassthrough
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_ACCELERATORPASSTHROUGH)
+    ]
+    HRESULT 
+    AcceleratorPassthrough(
+        [out, retval] LONG* pacceleratorPassthrough
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_SHADOWBITMAP)
+    ]
+    HRESULT 
+    ShadowBitmap(
+        [in] LONG shadowBitmap
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_SHADOWBITMAP)
+    ]
+    HRESULT ShadowBitmap(
+        [out, retval] LONG* pshadowBitmap
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_TRANSPORTTYPE)
+    ]
+    HRESULT 
+    TransportType(
+        [in] LONG transportType
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_TRANSPORTTYPE)
+    ]
+    HRESULT
+    TransportType(
+        [out, retval] LONG* ptransportType
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_SASSEQUENCE)
+    ]
+    HRESULT 
+    SasSequence(
+        [in] LONG sasSequence
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_SASSEQUENCE)
+    ]
+    HRESULT 
+    SasSequence(
+        [out, retval] LONG* psasSequence
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ENCRYPTIONENABLED)
+    ]
+    HRESULT 
+    EncryptionEnabled(
+        [in] LONG encryptionEnabled
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_ENCRYPTIONENABLED)
+    ]
+    HRESULT 
+    EncryptionEnabled(
+        [out, retval] LONG* pencryptionEnabled
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_DEDICATEDTERMINAL)
+    ]
+    HRESULT 
+    DedicatedTerminal(
+        [in] LONG dedicatedTerminal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_DEDICATEDTERMINAL)
+    ]
+    HRESULT 
+    DedicatedTerminal(
+        [out, retval] LONG* pdedicatedTerminal
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_RDPPORT)
+    ]
+    HRESULT 
+    RDPPort(
+        [in] LONG rdpPort
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_RDPPORT)
+    ]
+    HRESULT 
+    RDPPort(
+        [out, retval] LONG* prdpPort
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ENABLEMOUSE)
+    ]
+    HRESULT 
+    EnableMouse(
+        [in] LONG enableMouse
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_ENABLEMOUSE)
+    ]
+    HRESULT 
+    EnableMouse(
+        [out, retval] LONG* penableMouse
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_DISABLECTRLALTDEL)
+    ]
+    HRESULT 
+    DisableCtrlAltDel(
+        [in] LONG disableCtrlAltDel
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_DISABLECTRLALTDEL)
+    ]
+    HRESULT 
+    DisableCtrlAltDel(
+        [out, retval] LONG* pdisableCtrlAltDel
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ENABLEWINDOWSKEY)
+    ]
+    HRESULT 
+    EnableWindowsKey(
+        [in] LONG enableWindowsKey
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_ENABLEWINDOWSKEY)
+    ]
+    HRESULT 
+    EnableWindowsKey(
+        [out, retval] LONG* penableWindowsKey
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_DOUBLECLICKDETECT)
+    ]
+    HRESULT 
+    DoubleClickDetect(
+        [in] LONG doubleClickDetect
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_DOUBLECLICKDETECT)
+    ]
+    HRESULT 
+    DoubleClickDetect(
+        [out, retval] LONG* pdoubleClickDetect
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_MAXIMIZESHELL)
+    ]
+    HRESULT 
+    MaximizeShell(
+        [in] LONG maximizeShell
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_MAXIMIZESHELL)
+    ]
+    HRESULT 
+    MaximizeShell(
+        [out, retval] LONG* pmaximizeShell
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYFULLSCREEN)
+    ]
+    HRESULT 
+    HotKeyFullScreen(
+        [in] LONG hotKeyFullScreen
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYFULLSCREEN)
+    ]
+    HRESULT 
+    HotKeyFullScreen(
+        [out, retval] LONG* photKeyFullScreen
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYCTRLESC)
+    ]
+    HRESULT 
+    HotKeyCtrlEsc(
+        [in] LONG hotKeyCtrlEsc
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYCTRLESC)
+    ]
+    HRESULT 
+    HotKeyCtrlEsc(
+        [out, retval] LONG* photKeyCtrlEsc
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYALTESC)
+    ]
+    HRESULT 
+    HotKeyAltEsc(
+        [in] LONG hotKeyAltEsc
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYALTESC)
+    ]
+    HRESULT 
+    HotKeyAltEsc(
+        [out, retval] LONG* photKeyAltEsc
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYALTTAB)
+    ]
+    HRESULT 
+    HotKeyAltTab(
+        [in] LONG hotKeyAltTab
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYALTTAB)
+    ]
+    HRESULT 
+    HotKeyAltTab(
+        [out, retval] LONG* photKeyAltTab
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYALTSHIFTTAB)
+    ]
+    HRESULT 
+    HotKeyAltShiftTab(
+        [in] LONG hotKeyAltShiftTab
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYALTSHIFTTAB)
+    ]
+    HRESULT 
+    HotKeyAltShiftTab(
+        [out, retval] LONG* photKeyAltShiftTab
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYALTSPACE)
+    ]
+    HRESULT 
+    HotKeyAltSpace(
+        [in] LONG hotKeyAltSpace
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYALTSPACE)
+    ]
+    HRESULT 
+    HotKeyAltSpace(
+        [out, retval] LONG* photKeyAltSpace
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYCTRLALTDEL)
+    ]
+    HRESULT 
+    HotKeyCtrlAltDel(
+        [in] LONG hotKeyCtrlAltDel
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYCTRLALTDEL)
+    ]
+    HRESULT 
+    HotKeyCtrlAltDel(
+        [out, retval] LONG* photKeyCtrlAltDel
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ORDERDRAWTHRESHOLD)
+    ]
+    HRESULT 
+    orderDrawThreshold(
+        [in] LONG orderDrawThreshold
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_ORDERDRAWTHRESHOLD)
+    ]
+    HRESULT 
+    orderDrawThreshold(
+        [out, retval] LONG* porderDrawThreshold
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BITMAPCACHESIZE)
+    ]
+    HRESULT 
+    BitmapCacheSize(
+        [in] LONG bitmapCacheSize
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BITMAPCACHESIZE)
+    ]
+    HRESULT 
+    BitmapCacheSize(
+        [out, retval] LONG* pbitmapCacheSize
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHESIZE)
+    ]
+    HRESULT 
+    BitmapVirtualCacheSize(
+        [in] LONG bitmapVirtualCacheSize
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHESIZE)
+    ]
+    HRESULT 
+    BitmapVirtualCacheSize(
+        [out, retval] LONG* pbitmapVirtualCacheSize
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_SCALEBITMAPCACHESBYBPP)
+    ]
+    HRESULT 
+    ScaleBitmapCachesByBPP(
+        [in] LONG bScale
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_SCALEBITMAPCACHESBYBPP)
+    ]
+    HRESULT 
+    ScaleBitmapCachesByBPP(
+        [out, retval] LONG *pbScale
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_NUMBITMAPCACHES)
+    ]
+    HRESULT 
+    NumBitmapCaches(
+        [in] LONG numBitmapCaches
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_NUMBITMAPCACHES)
+    ]
+    HRESULT 
+    NumBitmapCaches(
+        [out, retval] LONG* pnumBitmapCaches
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CACHEPERSISTENCEACTIVE)
+    ]
+    HRESULT 
+    CachePersistenceActive(
+        [in] LONG cachePersistenceActive
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_CACHEPERSISTENCEACTIVE)
+    ]
+    HRESULT 
+    CachePersistenceActive(
+        [out, retval] LONG* pcachePersistenceActive
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_PERSISTCACHEDIRECTORY),
+    ]
+    HRESULT 
+    PersistCacheDirectory(
+        [in] BSTR  PersistCacheDirectory
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BRUSHSUPPORTLEVEL)
+    ]
+    HRESULT 
+    brushSupportLevel(
+        [in] LONG brushSupportLevel
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BRUSHSUPPORTLEVEL)
+    ]
+    HRESULT 
+    brushSupportLevel(
+        [out, retval] LONG* pbrushSupportLevel
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_MININPUTSENDINTERVAL)
+    ]
+    HRESULT 
+    minInputSendInterval(
+        [in] LONG minInputSendInterval
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_MININPUTSENDINTERVAL)
+    ]
+    HRESULT 
+    minInputSendInterval(
+        [out, retval] LONG* pminInputSendInterval
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_INPUTEVENTSATONCE)
+    ]
+    HRESULT 
+    InputEventsAtOnce(
+        [in] LONG inputEventsAtOnce
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_INPUTEVENTSATONCE)
+    ]
+    HRESULT 
+    InputEventsAtOnce(
+        [out, retval] LONG* pinputEventsAtOnce
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_MAXEVENTCOUNT)
+    ]
+    HRESULT 
+    maxEventCount(
+        [in] LONG maxEventCount
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_MAXEVENTCOUNT)
+    ]
+    HRESULT 
+    maxEventCount(
+        [out, retval] LONG* pmaxEventCount
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_KEEPALIVEINTERVAL)
+    ]
+    HRESULT 
+    keepAliveInterval(
+        [in] LONG keepAliveInterval
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_KEEPALIVEINTERVAL)
+    ]
+    HRESULT 
+    keepAliveInterval(
+        [out, retval] LONG* pkeepAliveInterval
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_SHUTDOWNTIMEOUT)
+    ]
+    HRESULT 
+    shutdownTimeout(
+        [in] LONG shutdownTimeout
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_SHUTDOWNTIMEOUT)
+    ]
+    HRESULT 
+    shutdownTimeout(
+        [out, retval] LONG* pshutdownTimeout
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_OVERALLCONNECTIONTIMEOUT)
+    ]
+    HRESULT 
+    overallConnectionTimeout(
+        [in] LONG overallConnectionTimeout
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_OVERALLCONNECTIONTIMEOUT)
+    ]
+    HRESULT 
+    overallConnectionTimeout(
+        [out, retval] LONG* poverallConnectionTimeout
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_SINGLECONNECTIONTIMEOUT)
+    ]
+    HRESULT 
+    singleConnectionTimeout(
+        [in] LONG singleConnectionTimeout
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_SINGLECONNECTIONTIMEOUT)
+    ]
+    HRESULT 
+    singleConnectionTimeout(
+        [out, retval] LONG* psingleConnectionTimeout
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_KEYBOARDTYPE)
+    ]
+    HRESULT 
+    KeyboardType(
+        [in] LONG keyboardType
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_KEYBOARDTYPE)
+    ]
+    HRESULT 
+    KeyboardType(
+        [out, retval] LONG* pkeyboardType
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_KEYBOARDSUBTYPE)
+    ]
+    HRESULT 
+    KeyboardSubType(
+        [in] LONG keyboardSubType
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_KEYBOARDSUBTYPE)
+    ]
+    HRESULT 
+    KeyboardSubType(
+        [out, retval] LONG* pkeyboardSubType
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_KEYBOARDFUNCTIONKEY)
+    ]
+    HRESULT 
+    KeyboardFunctionKey(
+        [in] LONG keyboardFunctionKey
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_KEYBOARDFUNCTIONKEY)
+    ]
+    HRESULT 
+    KeyboardFunctionKey(
+        [out, retval] LONG* pkeyboardFunctionKey
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_WINCEFIXEDPALETTE)
+    ]
+    HRESULT 
+    WinceFixedPalette(
+        [in] LONG winceFixedPalette
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_WINCEFIXEDPALETTE)
+    ]
+    HRESULT 
+    WinceFixedPalette(
+        [out, retval] LONG* pwinceFixedPalette
+        );
+
+    //
+    // Deprecated: use ConnectToAdministerServer
+    //
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CONNECT_TO_SERVER_CONSOLE)
+    ]
+    HRESULT 
+    ConnectToServerConsole(
+        [in] VARIANT_BOOL connectToServerConsole
+        );
+
+    //
+    // Deprecated: use ConnectToAdministerServer
+    //
+    [
+        propget, 
+        id(DISPID_PROP_ADV_CONNECT_TO_SERVER_CONSOLE)
+    ]
+    HRESULT 
+    ConnectToServerConsole(
+        [out, retval] VARIANT_BOOL* pConnectToConsole
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BITMAPPERSISTENCE)
+    ]
+    HRESULT 
+    BitmapPersistence(
+        [in]LONG bitmapPeristence
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BITMAPPERSISTENCE)
+    ]
+    HRESULT 
+    BitmapPersistence(
+        [out, retval] LONG* pbitmapPersistence
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_MINUTESTOIDLETIMEOUT)
+    ]
+    HRESULT 
+    MinutesToIdleTimeout(
+        [in] LONG minutesToIdleTimeout
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_MINUTESTOIDLETIMEOUT)
+    ]
+    HRESULT 
+    MinutesToIdleTimeout(
+        [out, retval] LONG* pminutesToIdleTimeout
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_SMART_SIZING)
+    ]
+    HRESULT SmartSizing  (
+        [in] VARIANT_BOOL fSmartSizing
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_SMART_SIZING)
+    ]
+    HRESULT SmartSizing  (
+        [out, retval] VARIANT_BOOL* pfSmartSizing
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_RDPDR_LOCALPRINTINGDOCNAME)
+    ]
+    HRESULT 
+    RdpdrLocalPrintingDocName(
+        [in] BSTR localPrintingDocName
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_RDPDR_LOCALPRINTINGDOCNAME)
+    ]
+    HRESULT 
+    RdpdrLocalPrintingDocName(
+        [out, retval] BSTR* pLocalPrintingDocName
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_RDPDR_CLIPCLEANTEMPDIR_STRING)
+    ]
+    HRESULT 
+    RdpdrClipCleanTempDirString(
+        [in] BSTR clipCleanTempDirString
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_RDPDR_CLIPCLEANTEMPDIR_STRING)
+    ]
+    HRESULT 
+    RdpdrClipCleanTempDirString (
+        [out, retval] BSTR* clipCleanTempDirString
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_RDPDR_CLIPPASTEINFO_STRING)
+    ]
+    HRESULT 
+    RdpdrClipPasteInfoString(
+        [in] BSTR clipPasteInfoString
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_RDPDR_CLIPPASTEINFO_STRING)
+    ]
+    HRESULT 
+    RdpdrClipPasteInfoString(
+        [out, retval] BSTR* clipPasteInfoString
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CLEARTEXTPASSWORD)
+    ]
+    HRESULT 
+    ClearTextPassword(
+        [in] BSTR clearTextPassword
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_DISPLAYCONNECTIONBAR)
+    ]
+    HRESULT 
+    DisplayConnectionBar  (
+        [in] VARIANT_BOOL fDisplayConnectionBar
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_DISPLAYCONNECTIONBAR)
+    ]
+    HRESULT 
+    DisplayConnectionBar  (
+        [out, retval] VARIANT_BOOL* pDisplayConnectionBar
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_PINCONNECTIONBAR)
+    ]
+    HRESULT 
+    PinConnectionBar  (
+        [in] VARIANT_BOOL fPinConnectionBar
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_PINCONNECTIONBAR)
+    ]
+    HRESULT 
+    PinConnectionBar(
+        [out, retval] VARIANT_BOOL* pPinConnectionBar
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_GRABFOCUSONCONNECT)
+    ]
+    HRESULT 
+    GrabFocusOnConnect  (
+        [in] VARIANT_BOOL fGrabFocusOnConnect
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_GRABFOCUSONCONNECT)
+    ]
+    HRESULT 
+    GrabFocusOnConnect  (
+        [out, retval] VARIANT_BOOL* pfGrabFocusOnConnect
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_LOADBALANCE_INFO)
+    ]
+    HRESULT 
+    LoadBalanceInfo(
+        [in] BSTR newLBInfo
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_LOADBALANCE_INFO)
+    ]
+    HRESULT 
+    LoadBalanceInfo(
+        [out, retval] BSTR* pLBInfo
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_REDIRECT_DRIVES)
+    ]
+    HRESULT 
+    RedirectDrives(
+        [in] VARIANT_BOOL redirectDrives
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_REDIRECT_DRIVES)
+    ]
+    HRESULT 
+    RedirectDrives(
+        [out, retval] VARIANT_BOOL* pRedirectDrives
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_REDIRECT_PRINTERS)
+    ]
+    HRESULT 
+    RedirectPrinters(
+        [in] VARIANT_BOOL redirectPrinters
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_REDIRECT_PRINTERS)
+    ]
+    HRESULT 
+    RedirectPrinters(
+        [out, retval] VARIANT_BOOL* pRedirectPrinters
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_REDIRECT_PORTS)
+    ]
+    HRESULT 
+    RedirectPorts(
+        [in] VARIANT_BOOL redirectPorts
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_REDIRECT_PORTS)
+    ]
+    HRESULT 
+    RedirectPorts(
+        [out, retval] VARIANT_BOOL* pRedirectPorts
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_REDIRECT_SMARTCARDS)
+    ]
+    HRESULT 
+    RedirectSmartCards(
+        [in] VARIANT_BOOL redirectSmartCards
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_REDIRECT_SMARTCARDS)
+    ]
+    HRESULT 
+    RedirectSmartCards(
+        [out, retval] VARIANT_BOOL* pRedirectSmartCards
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE16BPPSIZE)
+    ]
+    HRESULT 
+    BitmapVirtualCache16BppSize(
+        [in] LONG bitmapVirtualCache16BppSize
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE16BPPSIZE)
+    ]
+    HRESULT 
+    BitmapVirtualCache16BppSize(
+        [out, retval] LONG* pBitmapVirtualCache16BppSize
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE24BPPSIZE)
+    ]
+    HRESULT 
+    BitmapVirtualCache24BppSize(
+        [in] LONG bitmapVirtualCache24BppSize
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE24BPPSIZE)
+    ]
+    HRESULT 
+    BitmapVirtualCache24BppSize(
+        [out, retval] LONG* pBitmapVirtualCache24BppSize
+        );
+
+    //
+    // Performance disabled feature list.
+    // Enables or disables certain shell settings.
+    // The flags are defined in tsperf.h.
+    //
+    [
+        propput, 
+        id(DISIPD_PROP_ADV_PERFORMANCEFLAGS)
+    ]
+    HRESULT PerformanceFlags(
+        [in] LONG DisableList
+        );
+
+    [
+        propget, 
+        id(DISIPD_PROP_ADV_PERFORMANCEFLAGS),
+    ]
+    HRESULT PerformanceFlags(
+        [out, retval] LONG *pDisableList
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CONNECTIONSOCKET)
+    ]
+    HRESULT ConnectWithEndpoint(
+        [in] VARIANT* ConnectEndpoint 
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_NOTIFYTSPUBLICKEY),
+    ]
+    HRESULT NotifyTSPublicKey(
+        [in] VARIANT_BOOL fNotify 
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_NOTIFYTSPUBLICKEY),
+    ]
+    HRESULT NotifyTSPublicKey(
+        [out, retval] VARIANT_BOOL* pfNotify 
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings2 interface
+// Do not update this interface!
+// (Windows XP SP1)
+//
+
+[
+    object,
+    uuid(9ac42117-2b76-4320-aa44-0e616ab8437b),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings2 : IMsRdpClientAdvancedSettings
+{
+    //
+    // Can auto reconnect? Read only property that returns
+    // TRUE if autoreconnection information is available for this
+    // connection.
+    //
+    [
+        propget, 
+        id(DISPID_PROP_ADV_CANAUTORECONNECT)
+    ]
+    HRESULT 
+    CanAutoReconnect(
+        [out, retval] VARIANT_BOOL* pfCanAutoReconnect 
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_ENABLEAUTORECONNECT)
+    ]
+    HRESULT 
+    EnableAutoReconnect(
+        [in] VARIANT_BOOL fEnableAutoReconnect
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_ENABLEAUTORECONNECT)
+    ]
+    HRESULT 
+    EnableAutoReconnect(
+        [out, retval] VARIANT_BOOL* pfEnableAutoReconnect 
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_MAXRECONNECTATTEMPTS)
+    ]
+    HRESULT 
+    MaxReconnectAttempts(
+        [in] LONG MaxReconnectAttempts 
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_MAXRECONNECTATTEMPTS)
+    ]
+    HRESULT 
+    MaxReconnectAttempts(
+        [out, retval] LONG* pMaxReconnectAttempts 
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings3 interface
+// Do not update this interface!
+// (Windows Server 2003)
+//
+
+[
+    object,
+    uuid(19cd856b-c542-4c53-acee-f127e3be1a59),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings3 : IMsRdpClientAdvancedSettings2
+{
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CONBAR_SHOWMINIMIZE)
+    ]
+    HRESULT 
+    ConnectionBarShowMinimizeButton(
+        [in] VARIANT_BOOL fShowMinimize 
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_CONBAR_SHOWMINIMIZE)
+    ]
+    HRESULT 
+    ConnectionBarShowMinimizeButton(
+        [out, retval] VARIANT_BOOL* pfShowMinimize 
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CONBAR_SHOWRESTORE)
+    ]
+    HRESULT ConnectionBarShowRestoreButton(
+        [in] VARIANT_BOOL fShowRestore 
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_CONBAR_SHOWRESTORE)
+    ]
+    HRESULT 
+    ConnectionBarShowRestoreButton(
+        [out, retval] VARIANT_BOOL* pfShowRestore 
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings4 interface
+// Do not update this interface!
+// (Windows Server 2003 SP1)
+//
+
+[
+    object,
+    uuid(FBA7F64E-7345-4405-AE50-FA4A763DC0DE),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings4 : IMsRdpClientAdvancedSettings3
+{
+    [
+        propput,
+        id(DISPID_PROP_ADV_AUTH_LEVEL)
+    ]
+    HRESULT
+    AuthenticationLevel(
+        [in] UINT uiAuthLevel
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_AUTH_LEVEL)
+    ]
+    HRESULT
+    AuthenticationLevel(
+        [out, retval] UINT* puiAuthLevel
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings5 interface
+// (Windows Vista)
+//
+
+[
+    object,
+    uuid(FBA7F64E-6783-4405-DA45-FA4A763DABD0),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings5 : IMsRdpClientAdvancedSettings4
+{
+    [
+        propput,
+        id(DISPID_PROP_ADV_REDIRECT_CLIPBOARD)
+    ]
+    HRESULT
+    RedirectClipboard(
+        [in] VARIANT_BOOL fRedirectClipboard
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_REDIRECT_CLIPBOARD)
+    ]
+    HRESULT
+    RedirectClipboard(
+        [out, retval] VARIANT_BOOL* pfRedirectClipboard
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_AUDIO_REDIRECTION_MODE)
+    ]
+    HRESULT
+    AudioRedirectionMode(
+        [in] UINT uiAudioRedirectionMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_AUDIO_REDIRECTION_MODE)
+    ]
+    HRESULT
+    AudioRedirectionMode(
+        [out, retval] UINT* puiAudioRedirectionMode
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_CONBAR_SHOWPIN)
+    ]
+    HRESULT
+    ConnectionBarShowPinButton(
+        [in] VARIANT_BOOL fShowPin
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_CONBAR_SHOWPIN)
+    ]
+    HRESULT
+    ConnectionBarShowPinButton(
+        [out, retval] VARIANT_BOOL* pfShowPin
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_PUBLIC_MODE)
+    ]
+    HRESULT
+    PublicMode(
+        [in] VARIANT_BOOL fPublicMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_PUBLIC_MODE)
+    ]
+    HRESULT
+    PublicMode(
+        [out, retval] VARIANT_BOOL* pfPublicMode
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_DEVICE_REDIRECT)
+    ]
+    HRESULT
+    RedirectDevices(
+        [in] VARIANT_BOOL fRedirectPnPDevices
+        );
+    [
+        propget,
+        id(DISPID_PROP_ADV_DEVICE_REDIRECT)
+    ]
+    HRESULT
+    RedirectDevices(
+        [out, retval] VARIANT_BOOL *pfRedirectPnPDevices
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_POS_DEVICE_REDIRECT)
+    ]
+    HRESULT
+    RedirectPOSDevices(
+        [in] VARIANT_BOOL fRedirectPOSDevices
+        );
+    [
+        propget,
+        id(DISPID_PROP_ADV_POS_DEVICE_REDIRECT)
+    ]
+    HRESULT
+    RedirectPOSDevices(
+        [out, retval] VARIANT_BOOL *pfRedirectPOSDevices
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE32BPPSIZE),
+    ]
+    HRESULT 
+    BitmapVirtualCache32BppSize(
+        [in] LONG bitmapVirtualCache32BppSize
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_ADV_BITMAPVIRTUALCACHE32BPPSIZE),
+    ]
+    HRESULT 
+    BitmapVirtualCache32BppSize(
+        [out, retval] LONG* pBitmapVirtualCache32BppSize
+        );         
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings6 interface
+// (Windows Vista SP1 / Longhorn Server)
+//
+
+[
+    object,
+    uuid(222c4b5d-45d9-4df0-a7c6-60cf9089d285),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings6 : IMsRdpClientAdvancedSettings5
+{
+    [
+        propput,
+        id(DISPID_PROP_ADV_RELATIVEMOUSEMODE)
+    ]
+    HRESULT
+    RelativeMouseMode(
+        [in] VARIANT_BOOL fRelativeMouseMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_RELATIVEMOUSEMODE)
+    ]
+    HRESULT
+    RelativeMouseMode(
+        [out, retval] VARIANT_BOOL* pfRelativeMouseMode
+        );
+    [
+        propget,
+        id(DISPID_PROP_ADV_AUTH_SERVICE_CLASS)
+    ]
+    HRESULT
+    AuthenticationServiceClass(
+        [out, retval] BSTR* pbstrAuthServiceClass
+        );
+        
+    [
+        propput,
+        id(DISPID_PROP_ADV_AUTH_SERVICE_CLASS)
+    ]
+    HRESULT
+    AuthenticationServiceClass(
+        [in] BSTR bstrAuthServiceClass
+        );     
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_PCB)
+    ]
+    HRESULT
+    PCB(
+        [out, retval] BSTR* bstrPCB
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_PCB)
+    ]
+    HRESULT
+    PCB(
+        [in] BSTR bstrPCB
+        );    
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYFOCUSRELEASELEFT)
+    ]
+    HRESULT 
+    HotKeyFocusReleaseLeft(
+        [in] LONG hotKeyFocusReleaseLeft
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYFOCUSRELEASELEFT)
+    ]
+    HRESULT 
+    HotKeyFocusReleaseLeft(
+        [out, retval] LONG* hotKeyFocusReleaseLeft
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_HOTKEYFOCUSRELEASERIGHT)
+    ]
+    HRESULT 
+    HotKeyFocusReleaseRight(
+        [in] LONG hotKeyFocusReleaseRight
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_HOTKEYFOCUSRELEASERIGHT)
+    ]
+    HRESULT 
+    HotKeyFocusReleaseRight(
+        [out, retval] LONG* hotKeyFocusReleaseRight
+        );        
+
+    [
+        propput,
+        id(DISPID_PROP_ENABLE_CREDSSP_SUPPORT)
+    ]
+    HRESULT
+    EnableCredSspSupport(
+        [in] VARIANT_BOOL fEnableSupport
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ENABLE_CREDSSP_SUPPORT)
+    ]
+    HRESULT
+    EnableCredSspSupport(
+        [out, retval] VARIANT_BOOL* pfEnableSupport
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_AUTH_TYPE)
+    ]
+    HRESULT
+    AuthenticationType(
+        [out, retval] UINT* puiAuthType
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_ADV_CONNECT_TO_ADMINISTER_SERVER)
+    ]
+    HRESULT 
+    ConnectToAdministerServer(
+        [in] VARIANT_BOOL connectToAdministerServer
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADV_CONNECT_TO_ADMINISTER_SERVER)
+    ]
+    HRESULT 
+    ConnectToAdministerServer(
+        [out, retval] VARIANT_BOOL* pConnectToAdministerServer
+        );  
+
+}
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings7 interface
+// (Windows 7)
+//
+
+[
+    object,
+    uuid(26036036-4010-4578-8091-0db9a1edf9c3),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings7 : IMsRdpClientAdvancedSettings6
+{
+    [
+        propput,
+        id(DISPID_PROP_ADV_AUDIO_CAPTURE_REDIRECTION_MODE)
+    ]
+    HRESULT
+    AudioCaptureRedirectionMode(
+        [in] VARIANT_BOOL fRedir
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_AUDIO_CAPTURE_REDIRECTION_MODE)
+    ]
+    HRESULT
+    AudioCaptureRedirectionMode(
+        [out, retval] VARIANT_BOOL* pfRedir
+        );
+    [
+        propput,
+        id(DISPID_PROP_ADV_VIDEO_PLAYBACK_MODE)
+    ]
+    HRESULT
+    VideoPlaybackMode(
+        [in] UINT videoPlaybackMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_VIDEO_PLAYBACK_MODE)
+    ]
+    HRESULT
+    VideoPlaybackMode(
+        [out, retval] UINT* pVideoPlaybackMode
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_ENABLE_SUPERPAN)
+    ]
+    HRESULT
+    EnableSuperPan(
+        [in] VARIANT_BOOL fEnableSuperPan
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_ENABLE_SUPERPAN)
+    ]
+    HRESULT
+    EnableSuperPan(
+        [out, retval] VARIANT_BOOL* pfEnableSuperPan
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_SUPERPAN_ACCEL_FACTOR)
+    ]
+    HRESULT
+    SuperPanAccelerationFactor(
+        [in] ULONG uAccelFactor
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_SUPERPAN_ACCEL_FACTOR)
+    ]
+    HRESULT
+    SuperPanAccelerationFactor(
+        [out, retval] ULONG* puAccelFactor
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_NEG_SEC_LAYER)
+    ]
+    HRESULT
+    NegotiateSecurityLayer(
+        [in] VARIANT_BOOL fNegotiate
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_NEG_SEC_LAYER)
+    ]
+    HRESULT
+    NegotiateSecurityLayer(
+        [out, retval] VARIANT_BOOL* pfNegotiate
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_AUDIO_QUALITY_MODE)
+    ]
+    HRESULT
+    AudioQualityMode(
+        [in] UINT audioQualityMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_AUDIO_QUALITY_MODE)
+    ]
+    HRESULT
+    AudioQualityMode(
+        [out, retval] UINT* pAudioQualityMode
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_REDIRECT_DIRECTX)
+    ]
+    HRESULT
+    RedirectDirectX(
+        [in] VARIANT_BOOL fRedirectDirectX
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_REDIRECT_DIRECTX)
+    ]
+    HRESULT
+    RedirectDirectX(
+        [out, retval] VARIANT_BOOL* pfRedirectDirectX
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_NETWORK_CONNECTION_TYPE)
+    ]
+    HRESULT
+    NetworkConnectionType(
+        [in] UINT connectionType
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_NETWORK_CONNECTION_TYPE)
+    ]
+    HRESULT
+    NetworkConnectionType(
+        [out, retval] UINT* pConnectionType
+        );
+}
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientAdvancedSettings8 interface
+// (Windows 8)
+//
+
+[
+    object,
+    uuid(89acb528-2557-4d16-8625-226a30e97e9a),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClientAdvancedSettings8 : IMsRdpClientAdvancedSettings7
+{
+    [
+        propput,
+        id(DISPID_PROP_ADV_BANDWIDTH_AUTODETECT)
+    ]
+    HRESULT
+    BandwidthDetection(
+        [in] VARIANT_BOOL fAutodetect
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_BANDWIDTH_AUTODETECT)
+    ]
+    HRESULT
+    BandwidthDetection(
+        [out,retval] VARIANT_BOOL *pfAutodetect
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_ADV_CLIENT_PROTOCOL_SPEC),
+        helpstring("0 - disabled, 1 - 16MB cache, 2 - 16MB and CA 7.1")
+    ]
+    HRESULT
+    ClientProtocolSpec(
+        [in] ClientSpec ClientMode
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADV_CLIENT_PROTOCOL_SPEC)
+    ]
+    HRESULT
+    ClientProtocolSpec(
+        [out,retval] ClientSpec *pClientMode
+        );
+}
+
+// ----------------------------------------------------------------------------
+// IMsTscAx interface
+// Do not update this interface!
+// (TSAC)
+//
+[
+    object,
+    uuid(327bb5cd-834e-4400-aef2-b30e15e5d682),
+    dual,
+    pointer_default(unique)
+]
+interface IMsTscAx_Redist : IDispatch
+{
+
+};
+
+
+[
+    object,
+    uuid(8C11EFAE-92C3-11D1-BC1E-00C04FA31489),
+    dual,
+    pointer_default(unique)
+]
+interface IMsTscAx : IMsTscAx_Redist
+{
+    //
+    // Properties
+    //
+
+    [
+        propput, 
+        id(DISPID_PROP_SERVER)
+    ]
+    HRESULT 
+    Server(
+        [in] BSTR newVal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_SERVER)
+    ]
+    HRESULT 
+    Server(
+        [out, retval] BSTR* pServer
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_DOMAIN)
+    ]
+    HRESULT 
+    Domain(
+        [in] BSTR newVal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_DOMAIN)
+    ]
+    HRESULT 
+    Domain(
+        [out, retval] BSTR* pDomain
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_USERNAME)
+    ]
+    HRESULT 
+    UserName(
+        [in] BSTR newVal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_USERNAME)
+    ]
+    HRESULT 
+    UserName(
+        [out, retval] BSTR* pUserName
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_DISCONNECTED_TEXT)
+    ]
+    HRESULT 
+    DisconnectedText(
+        [in] BSTR  newVal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_DISCONNECTED_TEXT)
+    ]
+    HRESULT 
+    DisconnectedText(
+        [out, retval] BSTR* pDisconnectedText
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_CONNECTING_TEXT)
+    ]
+    HRESULT 
+    ConnectingText(
+        [in] BSTR newVal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_CONNECTING_TEXT)
+    ]
+    HRESULT ConnectingText(
+        [out, retval] BSTR* pConnectingText
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_CONNECTED)
+    ]
+    HRESULT 
+    Connected(
+        [out, retval] short *pIsConnected
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_DESKTOPWIDTH),
+    ]
+    HRESULT 
+    DesktopWidth(
+        [in] LONG newVal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_DESKTOPWIDTH),
+    ]
+    HRESULT 
+    DesktopWidth(
+        [out, retval] LONG* pVal
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_DESKTOPHEIGHT),
+    ]
+    HRESULT 
+    DesktopHeight(
+        [in] LONG newVal
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_DESKTOPHEIGHT),
+    ]
+    HRESULT 
+    DesktopHeight(
+        [out, retval] LONG* pVal
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_STARTCONNECTED),
+    ]
+    HRESULT 
+    StartConnected(
+        [in] BOOL fStartConnected
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_STARTCONNECTED)
+    ]
+    HRESULT 
+    StartConnected(
+        [out, retval] BOOL* pfStartConnected
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_HORIZSCROLLBAR)
+    ]
+    HRESULT 
+    HorizontalScrollBarVisible(
+        [out, retval] BOOL* pfHScrollVisible
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_VERTSCROLLBAR)
+    ]
+    HRESULT 
+    VerticalScrollBarVisible(
+        [out, retval] BOOL* pfVScrollVisible
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_FULLSCREENTITLE),
+    ]
+    HRESULT 
+    FullScreenTitle(
+        [in] BSTR fullScreenTitle
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_CIPHERSTRENGTH),
+    ]
+    HRESULT 
+    CipherStrength(
+        [out, retval] LONG* pCipherStrength
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_VERSION),
+    ]
+    HRESULT 
+    Version(
+        [out, retval] BSTR* pVersion
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_SECUREDSETTINGSENABLED),
+    ]
+    HRESULT 
+    SecuredSettingsEnabled(
+        [out, retval] BOOL* pSecuredSettingsEnabled
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_SECUREDSETTINGS),
+    ]
+    HRESULT 
+    SecuredSettings( 
+        [out, retval] IMsTscSecuredSettings** ppSecuredSettings
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADVSETTINGS),
+    ]
+    HRESULT 
+    AdvancedSettings(
+        [out, retval] IMsTscAdvancedSettings** ppAdvSettings
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_DEBUGGER),
+        hidden
+    ]
+    HRESULT 
+    Debugger( 
+        [out, retval] IMsTscDebug** ppDebugger
+        );
+
+    //
+    // Methods
+    //
+
+
+    [
+        id(DISPID_METHOD_CONNECT)
+    ]
+    HRESULT 
+    Connect();
+
+    [
+        id(DISPID_METHOD_DISCONNECT)
+    ]
+    HRESULT 
+    Disconnect();
+
+    [
+        id(DISPID_METHOD_CREATEVIRTUALCHANNELS),
+    ]
+    HRESULT 
+    CreateVirtualChannels(
+        [in] BSTR newVal
+        );
+
+    [
+        id(DISPID_METHOD_SENDONVIRTUALCHANNEL)
+    ]
+    HRESULT 
+    SendOnVirtualChannel(
+        [in] BSTR ChanName,
+        [in] BSTR ChanData
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient interface
+// Do not update this interface!
+// (Windows XP)
+//
+
+[
+    object,
+    uuid(92b4a539-7115-4b7c-a5a9-e5d9efc2780a),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient : IMsTscAx
+{
+    //
+    // Properties
+    //
+
+    [
+        propput, 
+        id(DISPID_PROP_COLORDEPTH)
+    ]
+    HRESULT 
+    ColorDepth(
+        [in] LONG colorDepth
+        );
+    
+    [
+        propget, 
+        id(DISPID_PROP_COLORDEPTH)
+    ]
+    HRESULT 
+    ColorDepth(
+        [out, retval] 
+        LONG* pcolorDepth
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_ADVSETTINGS2)
+    ]
+    HRESULT 
+    AdvancedSettings2(
+        [out, retval] IMsRdpClientAdvancedSettings** ppAdvSettings
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_SECUREDSETTINGS2)
+    ]
+    HRESULT 
+    SecuredSettings2( 
+        [out, retval] IMsRdpClientSecuredSettings** ppSecuredSettings
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_EXTENDEDDISCONNECTREASON)
+    ]
+    HRESULT 
+    ExtendedDisconnectReason(
+        [out, retval]
+        ExtendedDisconnectReasonCode* pExtendedDisconnectReason
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_FULLSCREEN)
+    ]
+    HRESULT 
+    FullScreen(
+        [in] VARIANT_BOOL fFullScreen
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_FULLSCREEN)
+    ]
+    HRESULT 
+    FullScreen(
+        [out, retval] VARIANT_BOOL* pfFullScreen
+        );
+
+    //
+    // Methods
+    //
+
+    [
+        id(DISPID_METHOD_SET_VIRTUALCHANNELOPTIONS)
+    ]
+    HRESULT 
+    SetVirtualChannelOptions(
+        [in] BSTR ChanName,
+        [in] LONG chanOptions
+        );
+
+    [
+        id(DISPID_METHOD_GET_VIRTUALCHANNELOPTIONS)
+    ]
+    HRESULT 
+    GetVirtualChannelOptions(
+        [in] BSTR ChanName,
+        [out, retval] LONG* pChanOptions
+        );
+
+    typedef enum {
+        controlCloseCanProceed    = 0x0000,
+        controlCloseWaitForEvents = 0x0001
+    } ControlCloseStatus;
+
+    [
+        id(DISPID_METHOD_REQUESTCLOSE)
+    ]
+    HRESULT 
+    RequestClose(
+        [out, retval] ControlCloseStatus* pCloseStatus
+        );
+};
+
+//
+// These codes come from tscerrs.h. They are the expanded out from
+// the bitfields that define error codes from different components.
+//
+// Disconnect reason code for OnDisconnected event.
+//
+typedef enum {
+    disconnectReasonNoInfo                     = 0,
+    disconnectReasonLocalNotError              = 1,
+    disconnectReasonRemoteByUser               = 2,
+    disconnectReasonByServer                   = 3,
+    disconnectReasonDNSLookupFailed            = 260,
+    disconnectReasonOutOfMemory                = 262,
+    disconnectReasonConnectionTimedOut         = 264,
+    disconnectReasonSocketConnectFailed        = 516,
+    disconnectReasonOutOfMemory2               = 518,
+    disconnectReasonHostNotFound               = 520,
+    disconnectReasonWinsockSendFailed          = 772,
+    disconnectReasonOutOfMemory3               = 774,
+    disconnectReasonInvalidIPAddr              = 776,
+    disconnectReasonSocketRecvFailed           = 1028,
+    disconnectReasonInvalidSecurityData        = 1030,
+    disconnectReasonInternalError              = 1032,
+    disconnectReasonInvalidEncryption          = 1286,
+    disconnectReasonDNSLookupFailed2           = 1288,
+    disconnectReasonGetHostByNameFailed        = 1540,
+    disconnectReasonInvalidServerSecurityInfo  = 1542,
+    disconnectReasonTimerError                 = 1544,
+    disconnectReasonTimeoutOccurred            = 1796,
+    disconnectReasonServerCertificateUnpackErr = 1798,
+    disconnectReasonInvalidIP                  = 2052,
+    disconnectReasonLicensingFailed            = 2056,
+    disconnectReasonInternalSecurityError      = 2310,
+    disconnectReasonAtClientWinsockFDCLOSE     = 2308,
+    disconnectReasonLicensingTimeout           = 2312,
+    disconnectReasonInternalSecurityError2     = 2566,
+    disconnectReasonEncryptionError            = 2822,
+    disconnectReasonDecryptionError            = 3078,
+    disconnectReasonClientDecompressionError   = 3080
+} DisconnectReasonCode;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient2 interface
+// Do not update this interface!
+// (Windows XP SP1)
+//
+
+[
+    object,
+    uuid(e7e17dc4-3b71-4ba7-a8e6-281ffadca28f),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient2 : IMsRdpClient
+{
+    [
+        propget,
+        id(DISPID_PROP_ADVSETTINGS3)
+    ]
+    HRESULT AdvancedSettings3(
+        [out, retval] IMsRdpClientAdvancedSettings2** ppAdvSettings
+        );
+
+    [
+        propput,
+        id(DISPID_PROP_CONNECTED_STATUS_TEXT)
+    ]
+    HRESULT
+    ConnectedStatusText(
+        [in] BSTR  newVal
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_CONNECTED_STATUS_TEXT)
+    ]
+    HRESULT
+    ConnectedStatusText(
+        [out, retval] BSTR* pConnectedStatusText
+        );
+};
+
+//
+// Autoreconnect continue states for OnAutoReconnecting
+//
+typedef enum {
+    autoReconnectContinueAutomatic = 0,
+    autoReconnectContinueStop      = 1,
+    autoReconnectContinueManual    = 2
+} AutoReconnectContinueState;
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient3 interface
+// Do not update this interface!
+// (Windows Server 2003)
+//
+
+[
+    object,
+    uuid(91b7cbc5-a72e-4fa0-9300-d647d7e897ff),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient3 : IMsRdpClient2
+{
+    [
+        propget,
+        id(DISPID_PROP_ADVSETTINGS4),
+    ]
+    HRESULT
+    AdvancedSettings4(
+        [out, retval] IMsRdpClientAdvancedSettings3** ppAdvSettings
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient4 interface
+// Do not update this interface!
+// (Windows Server 2003 SP1)
+//
+
+[
+    object,
+    uuid(095E0738-D97D-488b-B9F6-DD0E8D66C0DE),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient4 : IMsRdpClient3
+{
+    [
+        propget,
+        id(DISPID_PROP_ADVSETTINGS5)
+    ]
+    HRESULT
+    AdvancedSettings5(
+        [out, retval] IMsRdpClientAdvancedSettings4** ppAdvSettings
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient5 interface
+// (Windows Vista)
+//
+
+[
+    object,
+    uuid(4eb5335b-6429-477d-b922-e06a28ecd8bf),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient5 : IMsRdpClient4
+{
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_CONNECTION)
+    ]
+    HRESULT
+    TransportSettings(
+        [out, retval] IMsRdpClientTransportSettings** ppXportSet
+        );
+    [
+        propget,
+        id(DISPID_PROP_ADVSETTINGS6)
+    ]
+    HRESULT
+    AdvancedSettings6(
+        [out, retval] IMsRdpClientAdvancedSettings5** ppAdvSettings
+        );
+
+    [
+        id(DISPID_METHOD_GET_ERROR_DESCRIPTION)
+    ]
+    HRESULT 
+    GetErrorDescription (
+        [in] UINT disconnectReason,
+        [in] UINT extendedDisconnectReason,
+        [out, retval] BSTR* pBstrErrorMsg
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_REMOTEPROGRAM)
+    ]
+    HRESULT
+    RemoteProgram(
+        [out, retval] ITSRemoteProgram** ppRemoteProgram
+        );
+    [
+        propget,
+        id(DISPID_PROP_MSRDPCLIENTSHELL)
+    ]
+    HRESULT
+    MsRdpClientShell(
+        [out, retval] IMsRdpClientShell** ppLauncher
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient6 interface
+// (Windows Vista SP1 / Longhorn Server)
+//
+
+[
+    object,
+    uuid(d43b7d80-8517-4b6d-9eac-96ad6800d7f2),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient6 : IMsRdpClient5
+{
+    [
+        propget,
+        id(DISPID_PROP_ADVSETTINGS7)
+    ]
+    HRESULT
+    AdvancedSettings7(
+        [out, retval] IMsRdpClientAdvancedSettings6** ppAdvSettings
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_CONNECTION2)
+    ]
+    HRESULT
+    TransportSettings2(
+        [out, retval] IMsRdpClientTransportSettings2** ppXportSet2
+        );        
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient7 interface
+// (Windows 7)
+//
+
+[
+    object,
+    uuid(b2a5b5ce-3461-444a-91d4-add26d070638),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient7 : IMsRdpClient6
+{
+    [
+        propget,
+        id(DISPID_PROP_ADVSETTINGS8)
+    ]
+    HRESULT
+    AdvancedSettings8(
+        [out, retval] IMsRdpClientAdvancedSettings7** ppAdvSettings
+        );        
+
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_CONNECTION3)
+    ]
+    HRESULT
+    TransportSettings3(
+        [out, retval] IMsRdpClientTransportSettings3** ppXportSet3
+        );
+
+    [
+        id(DISPID_METHOD_GET_STATUS_TEXT)
+    ]
+    HRESULT 
+    GetStatusText(
+        [in] UINT statusCode,
+        [out, retval] BSTR* pBstrStatusText
+        );
+
+    [
+        propget, 
+        id(DISPID_PROP_SECUREDSETTINGS3)
+    ]
+    HRESULT 
+    SecuredSettings3( 
+        [out, retval] IMsRdpClientSecuredSettings2** ppSecuredSettings
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_REMOTEPROGRAM2)
+    ]
+    HRESULT
+    RemoteProgram2(
+        [out, retval] ITSRemoteProgram2** ppRemoteProgram
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient8 interface
+// (Windows 8)
+//
+
+[
+    object,
+    uuid(4247E044-9271-43A9-BC49-E2AD9E855D62),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient8 : IMsRdpClient7
+{
+    //ToDo: close on whether this should be part of scriptable or non-scriptable interface
+    [
+        id(DISPID_METHOD_REMOTE_ACTIONS)
+    ]
+    HRESULT
+    SendRemoteAction(
+        [in] RemoteSessionActionType actionType
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_ADVSETTINGS9)
+    ]
+    HRESULT
+    AdvancedSettings9(
+        [out, retval] IMsRdpClientAdvancedSettings8** ppAdvSettings
+        ); 
+
+    typedef enum {
+        controlReconnectStarted       = 0x0000,
+        controlReconnectBlocked       = 0x0001
+    } ControlReconnectStatus;
+
+    // Reconnects to server with updated desktop width\height  
+    [
+        id(DISPID_METHOD_RECONNECT)
+    ]
+    HRESULT 
+    Reconnect(
+        [in] ULONG ulWidth,
+        [in] ULONG ulHeight,
+        [out, retval] ControlReconnectStatus* pReconnectStatus
+        );
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClient9 interface
+// (Windows Blue)
+//
+
+[
+    object,
+    uuid(28904001-04B6-436C-A55B-0AF1A0883DC9),
+    dual,
+    pointer_default(unique)
+]
+interface IMsRdpClient9 : IMsRdpClient8
+{  
+    [
+        propget,
+        id(DISPID_PROP_TRANSPORT_CONNECTION4)
+    ]
+    HRESULT
+    TransportSettings4(
+        [out, retval] IMsRdpClientTransportSettings4** ppXportSet4
+        );
+
+    [
+        id(DISPID_METHOD_SYNC_SESSION_DISPLAY_SETTINGS)
+    ]
+    HRESULT
+    SyncSessionDisplaySettings();
+
+    [
+        id(DISPID_METHOD_UPDATE_SESSION_DISPLAY_SETTINGS)
+    ]
+    HRESULT
+    UpdateSessionDisplaySettings(
+        [in] ULONG   ulDesktopWidth,
+        [in] ULONG   ulDesktopHeight,
+        [in] ULONG   ulPhysicalWidth,
+        [in] ULONG   ulPhysicalHeight,
+        [in] ULONG   ulOrientation,
+        [in] ULONG   ulDesktopScaleFactor,
+        [in] ULONG   ulDeviceScaleFactor
+        );
+
+    [
+        id(DISPID_METHOD_ATTACH_EVENT)
+    ]
+    HRESULT
+    attachEvent(
+        [in] BSTR eventName,
+    	[in] IDispatch* callback
+    	);
+
+    [
+        id(DISPID_METHOD_DETACH_EVENT)
+    ]
+    HRESULT
+    detachEvent(
+        [in] BSTR eventName,
+        [in] IDispatch* callback
+        );
+
+// Uncomment for testing purposes.  Do not ship enabled.
+//    [
+//        id(DISPID_METHOD_TEST_EVENTS)
+//    ]
+//    HRESULT
+//    TestEvents();
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpClientEncoderServices interface
+// Private interface used by the encoder client. Don't add to a coclass.
+// (Windows Vista SP1 / Longhorn Server)
+//
+
+[
+    object,
+    uuid(f7cb0498-fbfe-44a2-99f9-59e59c05fd15),
+    pointer_default(unique)
+]
+interface IMsRdpClientEncoderServices : IUnknown {
+
+    [ 
+        id(DISPID_METHOD_SETWRITECOMPLETIONOPTIONS)
+    ]    
+    HRESULT 
+    SetWriteCompletionOptions(
+        [in] BSTR    ChanName,
+        [in] BOOL    fNotifyWrite,
+        [in] ULONG   cbSize
+        );
+
+    [ 
+        id(DISPID_METHOD_SETCROPPEDVIEWRECT)
+    ]   
+    HRESULT
+    SetCroppedViewRect(
+        [in] RECT rectCroppedView
+        );
+
+    [
+        propput, 
+        id(DISPID_PROP_CROPPED_VIEW)
+    ]
+    HRESULT 
+    CroppedView(
+        [in] VARIANT_BOOL fCroppedView
+        );
+    [
+        propget, 
+        id(DISPID_PROP_CROPPED_VIEW)
+    ]
+    HRESULT 
+    CroppedView(
+        [out,retval] VARIANT_BOOL* pfCroppedView
+        );
+
+    [
+        id(DISPID_METHOD_STARTRECORDING)
+    ]
+    HRESULT 
+    StartRecording(
+        [in] BSTR bstrRecordingFileName
+        );
+
+    [
+        id(DISPID_METHOD_STOPRECORDING)
+    ]
+    HRESULT 
+    StopRecording(); 
+
+    [
+        propput,
+        id(DISPID_PROP_DISABLE_INPUT)
+    ]
+    HRESULT 
+    InputAllowed(
+        [in] VARIANT_BOOL vbEnableInputControl
+        );   
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpDesktopBitmapAccess interface
+// (Windows 7+)
+//
+
+[
+    object,
+    uuid(29e8420b-e6b0-4cef-b445-b019601df0fe),
+    pointer_default(unique)
+]
+interface IMsRdpDesktopBitmapAccess: IUnknown 
+{
+
+    [
+        id(DISPID_METHOD_GETDESKTOP_BITMAP_INFO)
+    ]
+    HRESULT
+    GetDesktopBitmapInfo(
+        [in, out] long* plBitmapInfoWidth,
+        [in, out] long* plBitmapInfoHeigth,
+        [in, out] long* plBitmapInfoBpp
+        );
+
+    [
+        id(DISPID_METHOD_GETDESKTOP_BITMAP_BITS)
+    ]
+    HRESULT
+    GetDesktopBitmapBits(
+        [in] long lBitmapInfoWidth,
+        [in] long lBitmapInfoHeight,
+        [in] long lBitmapInfoBpp,
+        [in] long lBitmapOriginX,
+        [in] long lBitmapOriginY,
+        [in] long lBitmapWidth,
+        [in] long lBitmapHeight,
+        [in, out] BSTR pbstrBits
+        );
+
+};
+
+// ----------------------------------------------------------------------------
+// IMsRdpPreferredRedirectionInfo interface
+// (Windows 7)
+//
+
+[
+    object,
+    uuid(FDD029F9-9574-4DEF-8529-64B521CCCAA4),
+    pointer_default(unique)
+]
+interface IMsRdpPreferredRedirectionInfo : IUnknown
+{
+    [
+        propput,
+        id(DISPID_PROP_USE_REDIRECTION_SERVER_NAME)
+    ]
+    HRESULT
+    UseRedirectionServerName(
+        [in] VARIANT_BOOL Val
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_USE_REDIRECTION_SERVER_NAME)
+    ]
+    HRESULT
+    UseRedirectionServerName(
+        [out, retval] VARIANT_BOOL* pVal
+        );
+};
+
+
+// ----------------------------------------------------------------------------
+// IMsRdpExtendedSettings interface
+//
+[
+    object,
+    uuid(302d8188-0052-4807-806a-362b628f9ac5),
+    pointer_default(unique)
+]
+interface IMsRdpExtendedSettings : IUnknown
+{
+    [
+        propput,
+        id(DISPID_PROP_EXTENDED_PROPERTY)
+    ]
+    HRESULT Property(
+        [in] BSTR bstrPropertyName,
+        [in] VARIANT* pValue
+        );
+
+    [
+        propget,
+        id(DISPID_PROP_EXTENDED_PROPERTY)
+    ]
+    HRESULT Property(
+        [in] BSTR bstrPropertyName,
+        [out, retval] VARIANT* pValue
+        );
+};
+
+
+// ----------------------------------------------------------------------------
+// IMsRdpInputSink interface
+//
+
+typedef enum {
+    MOUSE_BUTTON_TYPE_BUTTON1  = 0,
+    MOUSE_BUTTON_TYPE_BUTTON2  = 1,
+    MOUSE_BUTTON_TYPE_BUTTON3  = 2,
+    MOUSE_BUTTON_TYPE_XBUTTON1 = 3,
+    MOUSE_BUTTON_TYPE_XBUTTON2 = 4,
+    MOUSE_BUTTON_TYPE_XBUTTON3 = 5
+} MouseButtonType;
+
+typedef enum {
+    KBD_CODE_TYPE_SCANCODE = 0,
+    KBD_CODE_TYPE_UNICODE  = 1
+} KbdCodeType;
+
+typedef enum {
+    KBD_SYNC_FLAG_SCROLL_LOCK = 1,
+    KBD_SYNC_FLAG_NUM_LOCK    = 2,
+    KBD_SYNC_FLAG_CAPS_LOCK   = 4,
+    KBD_SYNC_FLAG_KANA_LOCK   = 8
+} KbdSyncFlag;
+
+[
+    object,
+    uuid(4606850E-76A7-4E28-A47E-C7174F619351),
+    pointer_default(unique)
+]
+interface IMsRdpInputSink : IUnknown
+{
+    [
+        id(DISPID_METHOD_SEND_MOUSE_BUTTON_EVENT)
+    ]
+    HRESULT
+    SendMouseButtonEvent(
+        [in] MouseButtonType buttonType,
+        [in] VARIANT_BOOL    vbButtonDown,
+        [in] ULONG           xPos,
+        [in] ULONG           yPos
+        );   
+
+    [
+        id(DISPID_METHOD_SEND_MOUSE_MOVE_EVENT)
+    ]
+    HRESULT
+    SendMouseMoveEvent(
+        [in] ULONG xPos,
+        [in] ULONG yPos
+        );
+
+    [
+        id(DISPID_METHOD_SEND_MOUSE_WHEEL_EVENT)
+    ]
+    HRESULT
+    SendMouseWheelEvent(
+        [in] UINT16 wheelRotation
+        );    
+
+    [
+        id(DISPID_METHOD_SEND_KEYBOARD_EVENT)
+    ]
+    HRESULT
+    SendKeyboardEvent(
+        [in] KbdCodeType   codeType,
+        [in] UINT16        keycode,
+        [in] VARIANT_BOOL  vbKeyUp,
+        [in] VARIANT_BOOL  vbRepeat,
+        [in] VARIANT_BOOL  vbExtended
+        );    
+
+    [
+        id(DISPID_METHOD_SEND_SYNC_EVENT)
+    ]
+    HRESULT
+    SendSyncEvent(
+        [in] ULONG syncFlags
+        );
+
+    [
+        id(DISPID_METHOD_BEGIN_TOUCH_FRAME)
+    ]
+    HRESULT
+    BeginTouchFrame(
+        );
+
+    [
+        id(DISPID_METHOD_ADD_TOUCH_INPUT)
+    ]
+    HRESULT
+    AddTouchInput(
+        [in] UINT32 contactId,
+        [in] UINT32 event,
+        [in] INT32 x,
+        [in] INT32 y
+        );
+
+    [
+        id(DISPID_METHOD_END_TOUCH_FRAME)
+    ]
+    HRESULT
+    EndTouchFrame(
+        );
+};
+
+//
+// Remote Program Result Codes
+// enum values are mapped from values
+// from the header railprot.h
+//
+typedef enum {
+    remoteAppResultOk                = 0x0000,
+    remoteAppResultLocked            = 0x0001,
+    remoteAppResultProtocolError     = 0x0002,
+    remoteAppResultNotInWhitelist    = 0x0003,
+    remoteAppResultNetworkPathDenied = 0x0004,
+    remoteAppResultFileNotFound      = 0x0005,
+    remoteAppResultFailure           = 0x0006,
+    remoteAppResultHookNotLoaded     = 0x0007
+} RemoteProgramResult;
+
+//
+// Extra information in case remote programs are displayed
+//
+const int RAIL_APPDISPLAY_AUTORECONNECT = 1;
+const int RAIL_APPDISPLAY_DESKTOPHOOKED = 2;
+
+typedef enum {
+    remoteAppWindowNone             = 0,
+    remoteAppWindowDisplayed        = 1,
+    remoteAppShellIconDisplayed     = 2
+} RemoteWindowDisplayedAttribute;
+// ----------------------------------------------------------------------------
+// MSTSCLib library
+//
+
+[
+
+    uuid(8C11EFA1-92C3-11D1-BC1E-00C04FA31489),
+    version(1.0),
+    helpstring("Microsoft Terminal Services Control Type Library")
+]
+library MSTSCLib
+{
+    importlib("stdole2.tlb");
+
+    //
+    // Events
+    //
+
+    [
+        uuid(336d5562-efa8-482e-8cb3-c5c0fc7a7db6),
+    ]
+    dispinterface IMsTscAxEvents
+    {
+        properties:
+
+        methods:
+
+        [
+            id(DISPID_CONNECTING)
+        ]
+        void 
+        OnConnecting();
+
+        [
+            id(DISPID_CONNECTED)
+        ]
+        void 
+        OnConnected();
+
+        [
+            id(DISPID_LOGINCOMPLETE)
+        ]
+        void 
+        OnLoginComplete();
+
+        [
+            id(DISPID_DISCONNECTED)
+        ]
+        void 
+        OnDisconnected(
+            [in] LONG discReason
+            );
+
+        [
+            id(DISPID_ENTERFULLSCREENMODE)
+        ]
+        void 
+        OnEnterFullScreenMode();
+
+        [
+            id(DISPID_LEAVEFULLSCREENMODE)
+        ]
+        void 
+        OnLeaveFullScreenMode();
+
+        [
+            id(DISPID_CHANNELRECEIVEDDATA)
+        ]
+        void 
+        OnChannelReceivedData(
+            [in] BSTR chanName,
+            [in] BSTR data
+            );
+
+        [
+            id(DISPID_REQUESTGOFULLSCREEN)
+        ]
+        void 
+        OnRequestGoFullScreen();
+
+        [
+            id(DISPID_REQUESTLEAVEFULLSCREEN)
+        ]
+        void 
+        OnRequestLeaveFullScreen();
+
+        [
+            id(DISPID_FATALERROR)
+        ]
+        void 
+        OnFatalError(
+            [in] LONG errorCode
+            );
+
+        [
+            id(DISPID_WARNING)
+        ]
+        void 
+        OnWarning(
+            [in] LONG warningCode
+            );
+
+        [
+            id(DISPID_REMOTEDESKTOPSIZECHANGE)
+        ]
+        void 
+        OnRemoteDesktopSizeChange(
+            [in] LONG width,
+            [in] LONG height
+            );
+
+        [
+            id(DISPID_IDLETIMEOUTNOTIFICATION)
+        ]
+        void 
+        OnIdleTimeoutNotification();
+
+        [
+            id(DISPID_REQUESTCONTAINERMINIMIZE)
+        ]
+        void 
+        OnRequestContainerMinimize();
+
+        [
+            id(DISPID_CONFIRMCLOSE)
+        ]
+        void 
+        OnConfirmClose(
+            [out, retval] VARIANT_BOOL* pfAllowClose
+            );
+
+        
+        [
+            id(DISPID_RECEIVEDTSPUBLICKEY)
+        ]
+        void 
+        OnReceivedTSPublicKey(
+            [in] BSTR publicKey,
+            [out, retval] VARIANT_BOOL* pfContinueLogon
+            );
+
+        [
+            id(DISPID_AUTORECONNECTING)
+        ]
+        void 
+        OnAutoReconnecting(
+            [in] LONG disconnectReason,
+            [in] LONG attemptCount,
+            [out, retval] AutoReconnectContinueState* pArcContinueStatus
+            );
+
+        [
+            id(DISPID_INTERNALDIALOGDISPLAYED)
+        ]
+        void 
+        OnAuthenticationWarningDisplayed();
+
+        [
+            id(DISPID_INTERNALDIALOGDISMISSED)
+        ]
+        void 
+        OnAuthenticationWarningDismissed();
+        
+        [
+            id(DISPID_ONREMOTEPROGRAMRESULT)
+        ]
+        void 
+        OnRemoteProgramResult(
+            [in] BSTR            bstrRemoteProgram,
+            [in] RemoteProgramResult lError,
+            [in] VARIANT_BOOL    vbIsExecutable
+            );
+
+        [
+            id(DISPID_ONREMOTEPROGRAMDISPLAYED)
+        ]
+        void 
+        OnRemoteProgramDisplayed(
+            [in] VARIANT_BOOL vbDisplayed,
+            [in] ULONG       uDisplayInformation
+            );
+
+        [
+            id(DISPID_ONREMOTEWINDOWDISPLAYED)
+        ]
+        void 
+        OnRemoteWindowDisplayed(
+            [in] VARIANT_BOOL                   vbDisplayed,
+            [in] HWND                           hwnd,
+            [in] RemoteWindowDisplayedAttribute windowAttribute
+            );
+
+        [
+            id(DISPID_LOGONERROR)
+        ]
+        void 
+        OnLogonError(
+            [in] LONG lError
+            );
+
+        [
+            id(DISPID_FOCUSRELEASED)
+        ]
+        void 
+        OnFocusReleased(
+            [in] INT iDirection
+            );
+
+        [
+            id(DISPID_USERNAMEACQUIRED)
+        ]
+        void 
+        OnUserNameAcquired(
+            [in] BSTR bstrUserName
+            );
+
+        [
+            id(DISPID_MOUSEINPUTMODECHANGED)
+        ]
+        void 
+        OnMouseInputModeChanged(
+            [in] VARIANT_BOOL fMouseModeRelative
+            );
+
+        [
+            id(DISPID_SERVICEMESSAGERECEIVED)
+        ]
+        void 
+        OnServiceMessageReceived(
+            [in] BSTR serviceMessage
+            ); 
+
+        [
+            id(DISPID_CONNECTIONBARPULLDOWN)
+        ]
+        void 
+        OnConnectionBarPullDown();
+
+        [
+            id(DISPID_ONNETWORKSTATUSCHANGED)
+        ]
+        void
+        OnNetworkStatusChanged(
+            [in] ULONG qualityLevel,
+            [in] LONG bandwidth,
+            [in] LONG rtt
+            );
+
+        [
+            id(DISPID_CONNECTIONBARDEVICES)
+        ]
+        void
+        OnDevicesButtonPressed();
+
+        [
+            id(DISPID_AUTORECONNECTED)
+        ]
+        void
+        OnAutoReconnected();
+
+        [
+            id(DISPID_AUTORECONNECTING2)
+        ]
+        void
+        OnAutoReconnecting2(
+            [in] LONG disconnectReason,
+            [in] VARIANT_BOOL networkAvailable,
+            [in] LONG attemptCount,
+            [in] LONG maxAttemptCount
+            );
+
+    };
+    
+    //
+    // MsTscAx CoClass
+    // (TSAC)
+    //
+    [
+        uuid(a41a4187-5a86-4e26-b40a-856f9035d9cb),
+        control,
+        helpstring("Microsoft Terminal Services Client Control - version 1")
+    ]
+    coclass MsTscAxNotSafeForScripting
+    {
+                          interface     IMsRdpClient;
+        [default]         interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+    [
+        uuid(1fb464c8-09bb-4017-a2f5-eb742f04392f),
+        helpstring("Microsoft Terminal Services Client Control (redistributable) - version 1"),
+        noncreatable
+    ]
+    coclass MsTscAx
+    {
+                          interface     IMsRdpClient;
+        [default]         interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+
+    //
+    // MsRdpClient CoClass
+    // (Windows XP)
+    //
+
+    [
+        uuid(7cacbd7b-0d99-468f-ac33-22e495c0afe5),
+        control,
+        helpstring("Microsoft RDP Client Control - version 2")
+    ]
+    coclass MsRdpClientNotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+    [
+        uuid(791fa017-2de3-492e-acc5-53c67a2b94d0),
+        helpstring("Microsoft RDP Client Control (redistributable) - version 2"),
+        noncreatable
+    ]
+    coclass MsRdpClient
+    {
+        [default]         interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+
+    //
+    // MsRdpClient2 CoClass
+    // (Windows XP SP1)
+    //
+
+    [
+        uuid(3523c2fb-4031-44e4-9a3b-f1e94986ee7f),
+        control,
+        helpstring("Microsoft RDP Client Control - version 3")
+    ]
+    coclass MsRdpClient2NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+    [
+        uuid(9059f30f-4eb1-4bd2-9fdc-36f43a218f4a),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 3")
+    ]
+    coclass MsRdpClient2
+    {
+        [default]         interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+    //
+    // MsRdpClient2 (9059f30f-4eb1-4bd2-9fdc-36f43a218f4a) has been 
+    // deprecated (using the kill-bit mechanism) due to MSRC-8152. 
+    // MsRdpClient2a is the alternate CoClass.
+    //
+    [
+        uuid(971127BB-259F-48c2-BD75-5F97A3331551),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 3a")
+    ]
+    coclass MsRdpClient2a
+    {
+        [default]         interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+    //
+    // MsRdpClient3 CoClass
+    // (Windows Server 2003)
+    //
+
+    [
+        uuid(ace575fd-1fcf-4074-9401-ebab990fa9de),
+        control,
+        helpstring("Microsoft RDP Client Control - version 4")
+    ]
+    coclass MsRdpClient3NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+    [
+        uuid(7584c670-2274-4efb-b00b-d6aaba6d3850),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 4")
+    ]
+    coclass MsRdpClient3
+    {
+        [default]         interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+    //
+    // MsRdpClient3 (7584c670-2274-4efb-b00b-d6aaba6d3850) has been 
+    // deprecated (using the kill-bit mechanism) due to MSRC-8152. 
+    // MsRdpClient3a is the alternate CoClass.
+    //
+    [
+        uuid(6A6F4B83-45C5-4ca9-BDD9-0D81C12295E4),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 4a")
+    ]
+    coclass MsRdpClient3a
+    {
+        [default]         interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+    };
+
+
+    //
+    // MsRdpClient4 CoClass
+    // (Windows Server 2003 SP1)
+    //
+
+    [
+        uuid(6AE29350-321B-42be-BBE5-12FB5270C0DE),
+        control,
+        helpstring("Microsoft RDP Client Control - version 5")
+    ]
+    coclass MsRdpClient4NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+    };
+
+    [
+        uuid(4EDCB26C-D24C-4e72-AF07-B576699AC0DE),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 5")
+    ]
+    coclass MsRdpClient4
+    {
+        [default]         interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+    };
+
+    //
+    // MsRdpClient4 (4EDCB26C-D24C-4e72-AF07-B576699AC0DE) has been 
+    // deprecated (using the kill-bit mechanism) due to MSRC-8152. 
+    // MsRdpClient4a is the alternate CoClass.
+    //
+    [
+        uuid(54CE37E0-9834-41ae-9896-4DAB69DC022B),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 5a")
+    ]
+    coclass MsRdpClient4a
+    {
+        [default]         interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+    };
+   
+
+    //
+    // MsRdpClient5 CoClass
+    // (Windows Vista)
+    //
+
+    [
+        uuid(4eb2f086-c818-447e-b32c-c51ce2b30d31),
+        control,
+        helpstring("Microsoft RDP Client Control - version 6")
+    ]
+    coclass MsRdpClient5NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+    };
+
+    [
+        uuid(4eb89ff4-7f78-4a0f-8b8d-2bf02e94e4b2),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 6")
+    ]
+    coclass MsRdpClient5
+    {
+        [default]         interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+    };
+
+
+    //
+    // MsRdpClient6 CoClass
+    // (Windows Vista SP1 / Longhorn Server)
+    //
+
+    [
+        uuid(d2ea46a7-c2bf-426b-af24-e19c44456399),
+        control,
+        helpstring("Microsoft RDP Client Control - version 7")
+    ]
+    coclass MsRdpClient6NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+    };
+
+    [
+        uuid(7390f3d8-0439-4c05-91e3-cf5cb290c3d0),
+        control,
+        helpstring("Microsoft RDP Client Control (redistributable) - version 7")
+    ]
+    coclass MsRdpClient6
+    {
+        [default]         interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+    };
+
+    //
+    // MsRdpClient7 CoClass
+    // (Windows 7)
+    //
+
+    [
+        uuid(54d38bf7-b1ef-4479-9674-1bd6ea465258),
+        control,
+        helpstring("Microsoft RDP Client Control - version 8")
+    ]
+    coclass MsRdpClient7NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient7;
+                          interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+                          interface     IMsRdpClientNonScriptable5;
+                          interface     IMsRdpPreferredRedirectionInfo;
+                          interface     IMsRdpExtendedSettings;
+    };
+
+    [
+        uuid(a9d7038d-b5ed-472e-9c47-94bea90a5910),
+        helpstring("Microsoft RDP Client Control (redistributable) - version 8")
+    ]
+    coclass MsRdpClient7
+    {
+        [default]         interface     IMsRdpClient7;    
+                          interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+                          interface     IMsRdpClientNonScriptable5;
+                          interface     IMsRdpPreferredRedirectionInfo;
+    };
+
+    //
+    // MsRdpClient8 CoClass
+    // (Windows 8)
+    //
+
+    [
+        uuid(A3BC03A0-041D-42E3-AD22-882B7865C9C5),
+        helpstring("Microsoft RDP Client Control - version 9")
+    ]
+    coclass MsRdpClient8NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient8;
+                          interface     IMsRdpClient7;
+                          interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+                          interface     IMsRdpClientNonScriptable5;
+                          interface     IMsRdpPreferredRedirectionInfo;
+                          interface     IMsRdpExtendedSettings;
+    };
+
+    [
+        uuid(5F681803-2900-4C43-A1CC-CF405404A676),
+        helpstring("Microsoft RDP Client Control (redistributable) - version 9")
+    ]
+    coclass MsRdpClient8
+    {
+        [default]         interface     IMsRdpClient8;
+                          interface     IMsRdpClient7;
+                          interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+                          interface     IMsRdpClientNonScriptable5;
+                          interface     IMsRdpPreferredRedirectionInfo;
+    };
+
+    //
+    // MsRdpClient9 CoClass
+    // (Windows BLUE)
+    //
+
+    [
+        uuid(8B918B82-7985-4C24-89DF-C33AD2BBFBCD),
+        helpstring("Microsoft RDP Client Control - version 10")
+    ]
+    coclass MsRdpClient9NotSafeForScripting
+    {
+        [default]         interface     IMsRdpClient9;
+                          interface     IMsRdpClient8;
+                          interface     IMsRdpClient7;
+                          interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+                          interface     IMsRdpClientNonScriptable5;
+                          interface     IMsRdpPreferredRedirectionInfo;
+                          interface     IMsRdpExtendedSettings;
+    };
+
+    [
+        uuid(301B94BA-5D25-4A12-BFFE-3B6E7A616585),  
+        helpstring("Microsoft RDP Client Control (redistributable) - version 10")
+    ]
+    coclass MsRdpClient9
+    {
+        [default]         interface     IMsRdpClient9;
+                          interface     IMsRdpClient8;
+                          interface     IMsRdpClient7;
+                          interface     IMsRdpClient6;
+                          interface     IMsRdpClient5;
+                          interface     IMsRdpClient4;
+                          interface     IMsRdpClient3;
+                          interface     IMsRdpClient2;
+                          interface     IMsRdpClient;
+                          interface     IMsTscAx;
+                          interface     IMsTscAx_Redist;                          
+        [default, source] dispinterface IMsTscAxEvents;
+                          interface     IMsTscNonScriptable;
+                          interface     IMsRdpClientNonScriptable;
+                          interface     IMsRdpClientNonScriptable2;
+                          interface     IMsRdpClientNonScriptable3;
+                          interface     IMsRdpClientNonScriptable4;
+                          interface     IMsRdpClientNonScriptable5;
+                          interface     IMsRdpPreferredRedirectionInfo;
+    };
+    
+    [
+        uuid(079863B7-6D47-4105-8BFE-0CDCB360E67D),
+    ]
+    dispinterface IRemoteDesktopClientEvents
+    {
+        properties:
+
+        methods:
+
+        [
+            id(DISPID_AX_CONNECTING)
+        ]
+        void 
+        OnConnecting();
+
+        [
+            id(DISPID_AX_CONNECTED)
+        ]
+        void 
+        OnConnected();
+
+        [
+            id(DISPID_AX_LOGINCOMPLETED)
+        ]
+        void 
+        OnLoginCompleted();
+
+        [
+            id(DISPID_AX_DISCONNECTED)
+        ]
+        void 
+        OnDisconnected(
+            [in] LONG disconnectReason,
+            [in] LONG extendedDisconnectReason,
+            [in] BSTR disconnectErrorMessage
+            );
+
+        [
+            id(DISPID_AX_STATUSCHANGED)
+        ]
+        void 
+        OnStatusChanged(
+            [in] LONG statusCode,
+            [in] BSTR statusMessage
+            );
+
+        [
+            id(DISPID_AX_AUTORECONNECTING)
+        ]
+        void
+        OnAutoReconnecting(
+            [in] LONG disconnectReason,
+            [in] LONG extendedDisconnectReason,
+            [in] BSTR disconnectErrorMessage,
+            [in] VARIANT_BOOL networkAvailable,
+            [in] LONG attemptCount,
+            [in] LONG maxAttemptCount
+            );
+
+        [
+            id(DISPID_AX_AUTORECONNECTED)
+        ]
+        void
+        OnAutoReconnected();
+            
+        [
+            id(DISPID_AX_DIALOGDISPLAYING)
+        ]
+        void 
+        OnDialogDisplaying();
+           
+        [
+            id(DISPID_AX_DIALOGDISMISSED)
+        ]
+        void 
+        OnDialogDismissed();
+
+        [
+            id(DISPID_AX_NETWORKSTATUSCHANGED)
+        ]
+        void 
+        OnNetworkStatusChanged(
+            [in] ULONG qualityLevel,
+            [in] LONG bandwidth,
+            [in] LONG rtt
+            );
+            
+        [
+            id(DISPID_AX_ADMINMESSAGERECEIVED)
+        ]
+        void 
+        OnAdminMessageReceived(
+            [in] BSTR adminMessage
+            );
+
+        [
+            id(DISPID_AX_KEYCOMBINATIONPRESSED)
+        ]
+        void 
+        OnKeyCombinationPressed(
+            [in] LONG keyCombination
+            );
+
+        [
+            id(DISPID_AX_REMOTEDESKTOPSIZECHANGED)
+        ]
+        void
+        OnRemoteDesktopSizeChanged(
+            [in] LONG width,
+            [in] LONG height
+            );
+
+        [
+            id(DISPID_AX_TOUCHPOINTERCURSORMOVED)
+        ]
+        void
+        OnTouchPointerCursorMoved(
+            [in] LONG x,
+            [in] LONG y
+            );
+    };
+
+    [
+        uuid(EAB16C5D-EED1-4E95-868B-0FBA1B42C092),
+        helpstring("Microsoft Windows Store App Remote Desktop Client Control - version 1")
+    ]
+
+// should this be in the same library?
+    coclass RemoteDesktopClient
+    {
+        [default]         interface     IRemoteDesktopClient;
+        [default, source] dispinterface IRemoteDesktopClientEvents;
+    };
+};

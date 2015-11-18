@@ -17,6 +17,9 @@
       <UniqueIdentifier>{ea11ba80-4159-414d-9c5b-1019c9fa51ad}</UniqueIdentifier>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Imports">
+      <UniqueIdentifier>{6ad92092-a73b-4a9d-98ec-986d52fdc432}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -29,6 +32,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Kielbasa.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="guids.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionCallback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,6 +57,9 @@
     <ClInclude Include="Kielbasa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SessionCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SessionHelper.rc">
@@ -64,5 +76,10 @@
     <None Include="SessionHelper.def">
       <Filter>Source Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Imports\mstsax.idl">
+      <Filter>Imports</Filter>
+    </Midl>
   </ItemGroup>
 </Project>

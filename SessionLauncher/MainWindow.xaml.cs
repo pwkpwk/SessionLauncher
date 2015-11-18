@@ -1,6 +1,8 @@
 ﻿namespace SessionLauncher
 {
+    using System;
     using System.Windows;
+    using System.Windows.Interop;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -12,7 +14,13 @@
         public MainWindow()
         {
             InitializeComponent();
-            _kielbasa = new SessionHelper.Kielbasa();
+            _kielbasa = SessionHelper.Kielbasa.Create(new WindowInteropHelper(this));
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _kielbasa.Dispose();
+            base.OnClosed(e);
         }
     }
 }
