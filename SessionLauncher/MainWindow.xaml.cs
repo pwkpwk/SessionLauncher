@@ -14,7 +14,7 @@
         public MainWindow()
         {
             InitializeComponent();
-            _kielbasa = SessionHelper.Kielbasa.Create(new WindowInteropHelper(this));
+            _kielbasa = SessionHelper.Kielbasa.Create();
         }
 
         protected override void OnClosed(EventArgs e)
@@ -25,7 +25,7 @@
 
         private void OnLaunchSessionClicked(object sender, RoutedEventArgs e)
         {
-            _kielbasa.LaunchSession();
+            _kielbasa.LaunchSession("metazoidberg");
         }
     }
 }

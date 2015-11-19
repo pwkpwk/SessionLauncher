@@ -5,9 +5,9 @@
 
 namespace SessionHelper
 {
-	Kielbasa ^Kielbasa::Create(WindowInteropHelper ^windowHelper)
+	Kielbasa ^Kielbasa::Create()
 	{
-		Kielbasa ^kielbasa = gcnew Kielbasa(windowHelper);
+		Kielbasa ^kielbasa = gcnew Kielbasa();
 
 		if (!kielbasa->Initialize() || !kielbasa->CreateControl())
 		{
@@ -18,9 +18,8 @@ namespace SessionHelper
 		return kielbasa;
 	}
 
-	Kielbasa::Kielbasa(WindowInteropHelper ^windowHelper)
+	Kielbasa::Kielbasa()
 	:	m_clientAx(NULL),
-		m_windowHelper(windowHelper),
 		m_rdpClient(nullptr),
 		m_callbackCookie(0)
 	{
@@ -32,6 +31,15 @@ namespace SessionHelper
 		{
 			if (UnregisterCallback(m_rdpClient, m_callbackCookie))
 				m_callbackCookie = 0;
+
+			LPOLEOBJECT oobj;
+
+			if (SUCCEEDED(m_rdpClient->QueryInterface(&oobj)))
+			{
+				oobj->Close(OLECLOSE_NOSAVE);
+				oobj->Release();
+			}
+
 			m_rdpClient->Release();
 			m_rdpClient = nullptr;
 		}
@@ -39,7 +47,7 @@ namespace SessionHelper
 		::FreeLibrary(m_clientAx);
 	}
 
-	void Kielbasa::LaunchSession()
+	void Kielbasa::LaunchSession(System::String ^machineName)
 	{
 		LPOLEINPLACEACTIVEOBJECT obj;
 
@@ -67,11 +75,14 @@ namespace SessionHelper
 
 					if (SUCCEEDED(oleobj->DoVerb(OLEIVERB_PRIMARY, NULL, site, 0, hwnd, &rc)))
 					{
+						using namespace System::Runtime::InteropServices;
+
 						::ShowWindow(hwnd, SW_SHOW);
 						::UpdateWindow(hwnd);
-
-						ATL::CComBSTR bstrServer = OLESTR("metazoidberg");
+						
+						BSTR bstrServer = reinterpret_cast<BSTR>(Marshal::StringToBSTR(machineName).ToPointer());
 						m_rdpClient->put_Server(bstrServer);
+						::SysFreeString(bstrServer);
 
 						IMsRdpClientNonScriptable5 *sc5;
 						if (SUCCEEDED(m_rdpClient->QueryInterface(&sc5)))
@@ -96,6 +107,8 @@ namespace SessionHelper
 
 						m_rdpClient->Connect();
 					}
+
+					ownd->Release();
 				}
 
 				site->Release();

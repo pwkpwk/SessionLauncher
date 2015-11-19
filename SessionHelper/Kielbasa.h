@@ -9,23 +9,22 @@ namespace SessionHelper
 	public ref class Kielbasa sealed : ClientSiteEvents
 	{
 	private:
-		HMODULE						m_clientAx;
-		WindowInteropHelper ^ const	m_windowHelper;
-		IMsRdpClient				*m_rdpClient;
-		DWORD						m_callbackCookie;
+		HMODULE			m_clientAx;
+		IMsRdpClient	*m_rdpClient;
+		DWORD			m_callbackCookie;
 
 	public:
-		static Kielbasa ^Create(WindowInteropHelper ^windowHelper);
+		static Kielbasa ^Create();
 		virtual ~Kielbasa();
 
-		void LaunchSession();
+		void LaunchSession(System::String ^machineName);
 		//
 		// ClientSiteEvents
 		//
 		virtual void SizeChanged(short action, short cx, short cy);
 
 	private:
-		Kielbasa(WindowInteropHelper ^windowHelper);
+		Kielbasa();
 		bool Initialize();
 
 		bool CreateControl();
