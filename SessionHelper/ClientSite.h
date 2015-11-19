@@ -1,12 +1,20 @@
 #pragma once
+#include "ClientSiteEvents.h"
+#include "gcroot.h"
 
 class ATL_NO_VTABLE ClientSite : public ATL::CComObjectRoot, public IOleClientSite, public IOleInPlaceSiteEx
 {
 private:
 	HWND m_hwnd;
+	gcroot<SessionHelper::ClientSiteEvents ^> m_events;
 
 public:
 	ClientSite();
+
+	void AttachEvents(SessionHelper::ClientSiteEvents ^events)
+	{
+		m_events = events;
+	}
 
 	BEGIN_COM_MAP(ClientSite)
 		COM_INTERFACE_ENTRY(IOleClientSite)

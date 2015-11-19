@@ -106,6 +106,21 @@ namespace SessionHelper
 		}
 	}
 
+	void Kielbasa::SizeChanged(short action, short cx, short cy)
+	{
+		LPOLEINPLACEOBJECT inplobj;
+
+		if (SUCCEEDED(m_rdpClient->QueryInterface(&inplobj)))
+		{
+			RECT rc = { 0 };
+
+			rc.bottom = cy;
+			rc.right = cx;
+			inplobj->SetObjectRects(&rc, &rc);
+			inplobj->Release();
+		}
+	}
+
 	bool Kielbasa::Initialize()
 	{
 		m_clientAx = ::LoadLibrary(TEXT("rdclientax.dll"));
@@ -227,6 +242,7 @@ namespace SessionHelper
 		{
 			LPOLEOBJECT oobj;
 			site->AddRef();
+			site->AttachEvents(this);
 
 			if (SUCCEEDED(rdpClient->QueryInterface(&oobj)))
 			{

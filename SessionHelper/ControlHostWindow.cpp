@@ -4,8 +4,9 @@
 ATOM ControlHostWindow::sm_class = 0;
 
 static const TCHAR CLASS_NAME[] = { TEXT("ControlHostWindow") };
+static const DWORD WINDOW_STYLE = WS_OVERLAPPED | WS_CLIPCHILDREN | WS_MAXIMIZEBOX | WS_SIZEBOX | WS_THICKFRAME;
 
-HWND ControlHostWindow::Create()
+HWND ControlHostWindow::Create(SessionHelper::ClientSiteEvents ^events)
 {
 	HWND hwnd = NULL;
 
@@ -25,14 +26,15 @@ HWND ControlHostWindow::Create()
 
 	if (sm_class)
 	{
-		ControlHostWindow *newWindow = new ControlHostWindow();
-		hwnd = ::CreateWindowEx(0, CLASS_NAME, CLASS_NAME, WS_OVERLAPPED | WS_CLIPCHILDREN, 0, 0, 600, 320, NULL, NULL, hinst, newWindow);
+		ControlHostWindow *newWindow = new ControlHostWindow(events);
+		hwnd = ::CreateWindowEx(0, CLASS_NAME, CLASS_NAME, WINDOW_STYLE, 0, 0, 1024, 800, NULL, NULL, hinst, newWindow);
 	}
 
 	return hwnd;
 }
 
-ControlHostWindow::ControlHostWindow()
+ControlHostWindow::ControlHostWindow(SessionHelper::ClientSiteEvents ^events)
+:	m_events( events )
 {
 }
 
@@ -48,11 +50,15 @@ LRESULT CALLBACK ControlHostWindow::WindowProc(HWND hwnd, UINT message, WPARAM w
 	switch (message)
 	{
 	case WM_CREATE:
-		::SetWindowLong(hwnd, GWL_USERDATA, lParam);
+		{
+			LPCREATESTRUCT pcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
+			LONG_PTR self = reinterpret_cast<LONG_PTR>(pcs->lpCreateParams);
+			::SetWindowLongPtr(hwnd, GWLP_USERDATA, self);
+		}
 		break;
 
 	default:
-		wnd = reinterpret_cast<ControlHostWindow*>(::GetWindowLong(hwnd, GWL_USERDATA));
+		wnd = reinterpret_cast<ControlHostWindow*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
 		if (wnd)
 			rc = wnd->InternalWindowProc(hwnd, message, wParam, lParam);
 		else
@@ -70,7 +76,11 @@ LRESULT ControlHostWindow::InternalWindowProc(HWND hwnd, UINT message, WPARAM wP
 	switch (message)
 	{
 	case WM_NCDESTROY:
-		delete reinterpret_cast<ControlHostWindow*>(::GetWindowLong(hwnd, GWL_USERDATA));
+		delete reinterpret_cast<ControlHostWindow*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
+		break;
+
+	case WM_SIZE:
+		OnSize(wParam, lParam);
 		break;
 
 	default:
@@ -78,4 +88,9 @@ LRESULT ControlHostWindow::InternalWindowProc(HWND hwnd, UINT message, WPARAM wP
 	}
 
 	return rc;
+}
+
+void ControlHostWindow::OnSize(WPARAM action, LPARAM size)
+{
+	m_events->SizeChanged(action, LOWORD(size), HIWORD(size));
 }

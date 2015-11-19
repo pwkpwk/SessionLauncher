@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "ClientSite.h"
 #include "ControlHostWindow.h"
+#include "ClientSite.h"
 
 ClientSite::ClientSite()
 :	m_hwnd(NULL)
@@ -70,7 +70,7 @@ STDMETHODIMP ClientSite::GetWindow(__RPC__deref_out_opt HWND *phwnd)
 	{
 		if (!m_hwnd)
 		{
-			m_hwnd = ControlHostWindow::Create();
+			m_hwnd = ControlHostWindow::Create( m_events );
 
 			if (!m_hwnd)
 			{

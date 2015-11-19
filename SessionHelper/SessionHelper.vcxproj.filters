@@ -72,6 +72,9 @@
     <ClInclude Include="ControlHostWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ClientSiteEvents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SessionHelper.rc">

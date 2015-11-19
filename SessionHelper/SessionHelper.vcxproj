@@ -266,6 +266,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClientSite.h" />
+    <ClInclude Include="ClientSiteEvents.h" />
     <ClInclude Include="ControlHostWindow.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="Kielbasa.h" />

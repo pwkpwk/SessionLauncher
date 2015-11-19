@@ -1,11 +1,12 @@
 #pragma once
 #include <mstsax_h.h>
+#include "ClientSiteEvents.h"
 
 namespace SessionHelper
 {
 	using namespace System::Windows::Interop;
 
-	public ref class Kielbasa sealed
+	public ref class Kielbasa sealed : ClientSiteEvents
 	{
 	private:
 		HMODULE						m_clientAx;
@@ -18,6 +19,10 @@ namespace SessionHelper
 		virtual ~Kielbasa();
 
 		void LaunchSession();
+		//
+		// ClientSiteEvents
+		//
+		virtual void SizeChanged(short action, short cx, short cy);
 
 	private:
 		Kielbasa(WindowInteropHelper ^windowHelper);
