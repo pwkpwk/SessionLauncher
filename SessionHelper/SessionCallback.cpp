@@ -37,9 +37,11 @@ STDMETHODIMP SessionCallback::Invoke(_In_  DISPID dispIdMember, _In_  REFIID rii
 	switch (dispIdMember)
 	{
 	case DISPID_CONNECTING:
+		OnConnecting();
 		break;
 
 	case DISPID_CONNECTED:
+		OnConnected();
 		break;
 
 	case DISPID_DISCONNECTED:
@@ -189,6 +191,10 @@ STDMETHODIMP SessionCallback::Invoke(_In_  DISPID dispIdMember, _In_  REFIID rii
 }
 
 void SessionCallback::OnConnecting()
+{
+}
+
+void SessionCallback::OnConnected()
 {
 }
 

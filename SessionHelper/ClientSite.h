@@ -8,11 +8,6 @@ private:
 public:
 	ClientSite();
 
-	void AttachHWND(_In_ HWND hwnd)
-	{
-		m_hwnd = hwnd;
-	}
-
 	BEGIN_COM_MAP(ClientSite)
 		COM_INTERFACE_ENTRY(IOleClientSite)
 		COM_INTERFACE_ENTRY(IOleInPlaceSiteEx)

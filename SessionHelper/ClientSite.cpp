@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "ClientSite.h"
+#include "ControlHostWindow.h"
 
 ClientSite::ClientSite()
+:	m_hwnd(NULL)
 {
 }
 
@@ -11,6 +13,11 @@ ClientSite::~ClientSite()
 
 void ClientSite::FinalRelease()
 {
+	if (m_hwnd)
+	{
+		::DestroyWindow(m_hwnd);
+		m_hwnd = NULL;
+	}
 }
 
 //
@@ -53,7 +60,31 @@ STDMETHODIMP ClientSite::RequestNewObjectLayout()
 
 STDMETHODIMP ClientSite::GetWindow(__RPC__deref_out_opt HWND *phwnd)
 {
-	return E_NOTIMPL;
+	HRESULT hr = S_OK;
+
+	if (!phwnd)
+	{
+		hr = E_POINTER;
+	}
+	else
+	{
+		if (!m_hwnd)
+		{
+			m_hwnd = ControlHostWindow::Create();
+
+			if (!m_hwnd)
+			{
+				hr = HRESULT_FROM_WIN32(::GetLastError());
+			}
+		}
+
+		if (m_hwnd)
+		{
+			*phwnd = m_hwnd;
+		}
+	}
+
+	return hr;
 }
 
 STDMETHODIMP ClientSite::ContextSensitiveHelp(BOOL fEnterMode)
@@ -87,7 +118,21 @@ STDMETHODIMP ClientSite::GetWindowContext(
 	__RPC__out LPRECT lprcClipRect,
 	__RPC__inout LPOLEINPLACEFRAMEINFO lpFrameInfo)
 {
-	return E_NOTIMPL;
+	HRESULT	hr = S_OK;
+
+	if (!ppFrame || !ppDoc || !lprcPosRect || !lprcClipRect)
+	{
+		hr = E_POINTER;
+	}
+	else
+	{
+		::GetClientRect(m_hwnd, lprcPosRect);
+		*lprcClipRect = *lprcPosRect;
+		*ppFrame = nullptr;
+		*ppDoc = nullptr;
+	}
+
+	return hr;
 }
 
 STDMETHODIMP ClientSite::Scroll(SIZE scrollExtant)

@@ -45,8 +45,6 @@ namespace SessionHelper
 
 		if (SUCCEEDED(m_rdpClient->QueryInterface(&obj)))
 		{
-			HWND hwnd;
-
 			HRESULT hr;
 			LPOLEOBJECT oleobj = nullptr;
 
@@ -54,13 +52,52 @@ namespace SessionHelper
 
 			if (SUCCEEDED(hr))
 			{
-				RECT rc = { 0 };
-				HWND hwnd = reinterpret_cast<HWND>((HANDLE)m_windowHelper->Handle);
 				LPOLECLIENTSITE site = nullptr;
+				LPOLEWINDOW ownd;
 
-				::GetClientRect(hwnd, &rc);
 				oleobj->GetClientSite(&site);
-				hr = oleobj->DoVerb(OLEIVERB_PRIMARY, NULL, site, 0, hwnd, &rc);
+
+				if (SUCCEEDED(site->QueryInterface(&ownd)))
+				{
+					HWND	hwnd;
+					RECT	rc = { 0 };
+
+					ownd->GetWindow(&hwnd);
+					::GetClientRect(hwnd, &rc);
+
+					if (SUCCEEDED(oleobj->DoVerb(OLEIVERB_PRIMARY, NULL, site, 0, hwnd, &rc)))
+					{
+						::ShowWindow(hwnd, SW_SHOW);
+						::UpdateWindow(hwnd);
+
+						ATL::CComBSTR bstrServer = OLESTR("metazoidberg");
+						m_rdpClient->put_Server(bstrServer);
+
+						IMsRdpClientNonScriptable5 *sc5;
+						if (SUCCEEDED(m_rdpClient->QueryInterface(&sc5)))
+						{
+							sc5->put_AllowPromptingForCredentials(VARIANT_TRUE);
+							sc5->Release();
+						}
+
+						
+						IMsTscAdvancedSettings *as;
+						if (SUCCEEDED(m_rdpClient->get_AdvancedSettings(&as)))
+						{
+							IMsRdpClientAdvancedSettings4 *as4;
+
+							if (SUCCEEDED(as->QueryInterface(&as4)))
+							{
+								as4->put_AuthenticationLevel(2);
+								as4->Release();
+							}
+							as->Release();
+						}
+
+						m_rdpClient->Connect();
+					}
+				}
+
 				site->Release();
 				oleobj->Release();
 			}
@@ -190,10 +227,6 @@ namespace SessionHelper
 		{
 			LPOLEOBJECT oobj;
 			site->AddRef();
-
-			//
-			// TODO: attach a window handle to the client site
-			//
 
 			if (SUCCEEDED(rdpClient->QueryInterface(&oobj)))
 			{

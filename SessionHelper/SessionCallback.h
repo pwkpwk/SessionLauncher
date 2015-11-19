@@ -22,6 +22,7 @@ private:
 
 private:
 	void OnConnecting();
+	void OnConnected();
 	void OnDisconnecting();
 	void OnDisconnected(LONG code);
 	void OnLoginComplete();
