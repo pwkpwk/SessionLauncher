@@ -6,9 +6,17 @@
         xmlns:local="clr-namespace:SessionLauncher"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
+
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    
     <Grid>
-        <Button HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,4" Click="OnLaunchSessionClicked">
-            <TextBlock Text="Launch Session"/>
-        </Button>
+        <StackPanel Margin="10,0" VerticalAlignment="Center">
+            <TextBox Margin="0,0,0,5" Text="{Binding ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Command="{Binding LaunchSession}">
+                <TextBlock Text="Launch Session"/>
+            </Button>
+        </StackPanel>
     </Grid>
 </Window>
