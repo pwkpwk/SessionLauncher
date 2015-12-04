@@ -23,3 +23,4 @@
 #include <atlbase.h>
 #include <atlcom.h>
 #include <atlctl.h>
+#include <process.h>

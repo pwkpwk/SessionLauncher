@@ -36,14 +36,17 @@
         }
 
         private bool _disposedValue;
-        private readonly Command _launchSession;
+        private readonly Command _launchSession, _showThreadWindow, _deleteThreadWindow;
         private readonly Kielbasa _kielbasa;
         private string _serverName;
+        private ThreadWindow _threadWindow;
 
         public MainWindowViewModel()
         {
             _disposedValue = false;
             _launchSession = new Command(this.ExecuteLaunchSession, this.CanExecuteLaunchSession);
+            _showThreadWindow = new Command(this.ExecuteShowThreadWindow, this.CanExecuteShowThreadWindow);
+            _deleteThreadWindow = new Command(this.ExecuteDeleteThreadWindow, this.CanExecuteDeleteThreadWindow);
             _kielbasa = Kielbasa.Create();
         }
 
@@ -53,10 +56,9 @@
             Dispose(false);
         }
 
-        public ICommand LaunchSession
-        {
-            get { return _launchSession; }
-        }
+        public ICommand LaunchSession { get { return _launchSession; } }
+        public ICommand ShowThreadWindow { get { return _showThreadWindow; } }
+        public ICommand DeleteThreadWindow { get { return _deleteThreadWindow; } }
 
         public string ServerName
         {
@@ -86,6 +88,31 @@
             }
 
             return canExecute;
+        }
+
+        private void ExecuteShowThreadWindow(object parameter)
+        {
+            _threadWindow = _kielbasa.CreateThreadWindow();
+            _showThreadWindow.EmitCanExecuteChanged();
+            _deleteThreadWindow.EmitCanExecuteChanged();
+        }
+
+        private bool CanExecuteShowThreadWindow(object parameter)
+        {
+            return null == _threadWindow;
+        }
+
+        private void ExecuteDeleteThreadWindow(object parameter)
+        {
+            _threadWindow.Dispose();
+            _threadWindow = null;
+            _showThreadWindow.EmitCanExecuteChanged();
+            _deleteThreadWindow.EmitCanExecuteChanged();
+        }
+
+        private bool CanExecuteDeleteThreadWindow(object parameter)
+        {
+            return null != _threadWindow;
         }
 
         #region IDisposable Support

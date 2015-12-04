@@ -1,11 +1,10 @@
 #pragma once
 #include <mstsax_h.h>
 #include "ClientSiteEvents.h"
+#include "ThreadWindow.h"
 
 namespace SessionHelper
 {
-	using namespace System::Windows::Interop;
-
 	public ref class Kielbasa sealed : ClientSiteEvents
 	{
 	private:
@@ -18,6 +17,7 @@ namespace SessionHelper
 		virtual ~Kielbasa();
 
 		void LaunchSession(System::String ^machineName);
+		ThreadWindow ^CreateThreadWindow();
 		//
 		// ClientSiteEvents
 		//

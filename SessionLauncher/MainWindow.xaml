@@ -17,6 +17,12 @@
             <Button Command="{Binding LaunchSession}">
                 <TextBlock Text="Launch Session"/>
             </Button>
+            <Button Command="{Binding ShowThreadWindow}">
+                <TextBlock Text="Create Thread Window"/>
+            </Button>
+            <Button Command="{Binding DeleteThreadWindow}">
+                <TextBlock Text="Delete Thread Window"/>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

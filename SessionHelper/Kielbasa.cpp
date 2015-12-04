@@ -119,6 +119,11 @@ namespace SessionHelper
 		}
 	}
 
+	ThreadWindow ^Kielbasa::CreateThreadWindow()
+	{
+		return gcnew ThreadWindow();
+	}
+
 	void Kielbasa::SizeChanged(short action, short cx, short cy)
 	{
 		LPOLEINPLACEOBJECT inplobj;
