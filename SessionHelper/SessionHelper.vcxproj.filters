@@ -87,6 +87,18 @@
     <ClInclude Include="ThreadWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Imports\tscwkspinternal.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="Imports\tscguids.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="Imports\autreg.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
+    <ClInclude Include="Imports\tsperf.h">
+      <Filter>Imports</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SessionHelper.rc">

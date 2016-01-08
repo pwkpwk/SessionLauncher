@@ -271,6 +271,10 @@
     <ClInclude Include="ClientSiteEvents.h" />
     <ClInclude Include="ControlHostWindow.h" />
     <ClInclude Include="dllmain.h" />
+    <ClInclude Include="Imports\autreg.h" />
+    <ClInclude Include="Imports\tscguids.h" />
+    <ClInclude Include="Imports\tscwkspinternal.h" />
+    <ClInclude Include="Imports\tsperf.h" />
     <ClInclude Include="Kielbasa.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SessionCallback.h" />

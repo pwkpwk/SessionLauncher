@@ -24,3 +24,6 @@
 #include <atlcom.h>
 #include <atlctl.h>
 #include <process.h>
+#include "Imports\tscwkspinternal.h"
+#include "Imports\tscguids.h"
+#include "Imports\autreg.h"
