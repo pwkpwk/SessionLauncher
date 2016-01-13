@@ -106,6 +106,32 @@ namespace SessionHelper
 							client5->put_TrustedZoneSite(VARIANT_FALSE);
 							client5->put_DisableRemoteAppCapsCheck(VARIANT_FALSE);
 							client5->put_ClearTextPassword(password);
+							client5->put_EnableCredSspSupport(VARIANT_TRUE);
+							client5->put_PromptForCredentials(VARIANT_FALSE);
+							client5->put_AllowCredentialSaving(VARIANT_FALSE);
+							client5->put_PromptForCredsOnClient(VARIANT_FALSE);
+							client5->put_NegotiateSecurityLayer(VARIANT_TRUE);
+							client5->put_LaunchedViaClientShellInterface(VARIANT_FALSE);
+							client5->put_TrustedZoneSite(VARIANT_FALSE);
+							client5->put_ShowRedirectionWarningDialog(VARIANT_TRUE);
+							client5->put_RedirectionWarningType(RedirectionWarningTypeThirdPartySigned);
+							client5->put_MarkRdpSettingsSecure(VARIANT_TRUE);
+							//
+							// ???
+							//
+							// client5->put_PublisherCertificateChain();
+							client5->put_WarnAboutClipboardRedirection(VARIANT_TRUE);
+							client5->put_WarnAboutPrinterRedirection(VARIANT_TRUE);
+							client5->put_WarnAboutDirectXRedirection(VARIANT_TRUE);
+							client5->put_WarnAboutSendingCredentials(VARIANT_TRUE);
+
+							IMsRdpPreferredRedirectionInfo *redirinfo;
+
+							if (S_OK == m_rdpClient->QueryInterface(&redirinfo))
+							{
+								redirinfo->put_UseRedirectionServerName(VARIANT_FALSE);
+								redirinfo->Release();
+							}
 
 							IMsRdpClient9 *client9;
 							ITSRemoteProgram2 *program2 = nullptr;
@@ -234,6 +260,8 @@ namespace SessionHelper
 									advset8->put_PublicMode(VARIANT_FALSE);
 									advset8->put_EnableSuperPan(VARIANT_FALSE);
 									advset8->put_SuperPanAccelerationFactor(1);
+									advset8->put_PerformanceFlags(0x186);
+									advset8->put_GrabFocusOnConnect(VARIANT_FALSE);
 
 									advset8->Release();
 								}
@@ -245,6 +273,17 @@ namespace SessionHelper
 									CComVariant var(OLESTR(""));
 
 									extset->put_Property(UTREG_UI_FEDAUTH_TOKEN, &var);
+
+									var = true;
+									extset->put_Property(UTREG_UI_ENABLE_REMOTEEDGEBAR, &var);
+
+									var = false;
+									extset->put_Property(UTREG_UI_DISABLE_SEAMLESS_LANGUAGE_BAR, &var);
+									extset->put_Property(UTREG_UI_DISABLE_TOUCH_REMOTING, &var);
+
+									var = OLESTR("https://telemetry.remoteapp.windowsazure.com/webUpload?mohoroId=754606d9-5159-4514-8b2d-5c5a10610285");
+									extset->put_Property(UTREG_EVENTLOG_UPLOAD_ADDRESS, &var);
+
 									extset->Release();
 								}
 
@@ -253,6 +292,8 @@ namespace SessionHelper
 
 							client5->Release();
 						}
+
+						m_rdpClient->Connect();
 
 #if 0
 						BSTR bstrServer = reinterpret_cast<BSTR>(Marshal::StringToBSTR(machineName).ToPointer());
