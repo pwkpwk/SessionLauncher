@@ -26,31 +26,37 @@ void ClientSite::FinalRelease()
 
 STDMETHODIMP ClientSite::SaveObject()
 {
+	ATLTRACE("ClientSite::SaveObject()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::GetMoniker(DWORD dwAssign, DWORD dwWhichMoniker, __RPC__deref_out_opt IMoniker **ppmk)
 {
+	ATLTRACE("ClientSite::GetMoniker()\n");
 	return E_NOTIMPL;
 }
 
 STDMETHODIMP ClientSite::GetContainer(__RPC__deref_out_opt IOleContainer **ppContainer)
 {
+	ATLTRACE("ClientSite::GetContainer()\n");
 	return E_NOINTERFACE;
 }
 
 STDMETHODIMP ClientSite::ShowObject()
 {
+	ATLTRACE("ClientSite::ShowObject()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::OnShowWindow(BOOL fShow)
 {
+	ATLTRACE("ClientSite::OnShowWindow(fShow=%d)\n", fShow);
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::RequestNewObjectLayout()
 {
+	ATLTRACE("ClientSite::RequestNewObjectLayout()\n");
 	return E_NOTIMPL;
 }
 
@@ -61,6 +67,8 @@ STDMETHODIMP ClientSite::RequestNewObjectLayout()
 STDMETHODIMP ClientSite::GetWindow(__RPC__deref_out_opt HWND *phwnd)
 {
 	HRESULT hr = S_OK;
+
+	ATLTRACE("ClientSite::GetWindow()\n");
 
 	if (!phwnd)
 	{
@@ -89,6 +97,7 @@ STDMETHODIMP ClientSite::GetWindow(__RPC__deref_out_opt HWND *phwnd)
 
 STDMETHODIMP ClientSite::ContextSensitiveHelp(BOOL fEnterMode)
 {
+	ATLTRACE("ClientSite::ContextSensitiveHelp()\n");
 	return S_OK;
 }
 
@@ -98,16 +107,19 @@ STDMETHODIMP ClientSite::ContextSensitiveHelp(BOOL fEnterMode)
 
 STDMETHODIMP ClientSite::CanInPlaceActivate()
 {
+	ATLTRACE("ClientSite::CanInPlaceActivate()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::OnInPlaceActivate()
 {
+	ATLTRACE("ClientSite::OnInPlaceActivate()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::OnUIActivate()
 {
+	ATLTRACE("ClientSite::OnUIActivate()\n");
 	return S_OK;
 }
 
@@ -119,6 +131,8 @@ STDMETHODIMP ClientSite::GetWindowContext(
 	__RPC__inout LPOLEINPLACEFRAMEINFO lpFrameInfo)
 {
 	HRESULT	hr = S_OK;
+
+	ATLTRACE("ClientSite::GetWindowContext\n");
 
 	if (!ppFrame || !ppDoc || !lprcPosRect || !lprcClipRect)
 	{
@@ -137,31 +151,37 @@ STDMETHODIMP ClientSite::GetWindowContext(
 
 STDMETHODIMP ClientSite::Scroll(SIZE scrollExtant)
 {
+	ATLTRACE("ClientSite::Scroll(%d, %d)\n", scrollExtant.cx, scrollExtant.cy);
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::OnUIDeactivate(BOOL fUndoable)
 {
+	ATLTRACE("ClientSite::OnUIDeactivate(fUndoable=%d)\n", fUndoable);
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::OnInPlaceDeactivate()
 {
+	ATLTRACE("ClientSite::OnInPlaceDeactivate()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::DiscardUndoState()
 {
+	ATLTRACE("ClientSite::DiscardUndoState()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::DeactivateAndUndo()
 {
+	ATLTRACE("ClientSite::DeactivateAndUndo()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::OnPosRectChange(__RPC__in LPCRECT lprcPosRect)
 {
+	ATLTRACE("ClientSite::OnPosRectChange()\n");
 	return S_OK;
 }
 
@@ -172,6 +192,8 @@ STDMETHODIMP ClientSite::OnPosRectChange(__RPC__in LPCRECT lprcPosRect)
 STDMETHODIMP ClientSite::OnInPlaceActivateEx(__RPC__out BOOL *pfNoRedraw, DWORD dwFlags)
 {
 	HRESULT hr = S_OK;
+
+	ATLTRACE("ClientSite::OnInPlaceActivateEx()\n");
 
 	if (!pfNoRedraw)
 	{
@@ -187,10 +209,12 @@ STDMETHODIMP ClientSite::OnInPlaceActivateEx(__RPC__out BOOL *pfNoRedraw, DWORD 
 
 STDMETHODIMP ClientSite::OnInPlaceDeactivateEx(BOOL fNoRedraw)
 {
+	ATLTRACE("ClientSite::OnInPlaceDeactivateEx()\n");
 	return S_OK;
 }
 
 STDMETHODIMP ClientSite::RequestUIActivate()
 {
+	ATLTRACE("ClientSite::RequestUIActivate()\n");
 	return S_OK;
 }

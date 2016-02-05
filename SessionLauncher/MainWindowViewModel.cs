@@ -3,8 +3,10 @@
     using SessionHelper;
     using System;
     using System.Windows.Input;
-
-    sealed class MainWindowViewModel : IDisposable
+    using ViewModels;
+    using System.Windows.Interop;
+    using System.Threading.Tasks;
+    sealed class MainWindowViewModel : IDisposable, IWindowHandleReceiver
     {
         private sealed class Command : ICommand
         {
@@ -36,17 +38,20 @@
         }
 
         private bool _disposedValue;
-        private readonly Command _launchSession, _showThreadWindow, _deleteThreadWindow;
+        private readonly Command _launchSession, _showThreadWindow, _deleteThreadWindow, _authenticate, _launchApplication;
         private readonly Kielbasa _kielbasa;
         private string _serverName;
         private ThreadWindow _threadWindow;
+        private WindowInteropHelper _window;
 
         public MainWindowViewModel()
         {
             _disposedValue = false;
-            _launchSession = new Command(this.ExecuteLaunchSession, this.CanExecuteLaunchSession);
+            _launchSession = new Command(this.ExecuteLaunchSession);
             _showThreadWindow = new Command(this.ExecuteShowThreadWindow, this.CanExecuteShowThreadWindow);
             _deleteThreadWindow = new Command(this.ExecuteDeleteThreadWindow, this.CanExecuteDeleteThreadWindow);
+            _authenticate = new Command(this.ExecuteAuthenticate);
+            _launchApplication = new Command(this.ExecuteLaunchApplication);
             _kielbasa = Kielbasa.Create();
         }
 
@@ -59,6 +64,8 @@
         public ICommand LaunchSession { get { return _launchSession; } }
         public ICommand ShowThreadWindow { get { return _showThreadWindow; } }
         public ICommand DeleteThreadWindow { get { return _deleteThreadWindow; } }
+        public ICommand Authenticate { get { return _authenticate; } }
+        public ICommand LaunchApplication { get { return _launchApplication; } }
 
         public string ServerName
         {
@@ -73,9 +80,23 @@
             }
         }
 
+        WindowInteropHelper IWindowHandleReceiver.Window
+        {
+            get { return _window; }
+
+            set
+            {
+                if(!WindowInteropHelper.Equals(_window, value))
+                {
+                    _window = value;
+                    _kielbasa.SetWindow(_window);
+                }
+            }
+        }
+
         private void ExecuteLaunchSession(object parameter)
         {
-            _kielbasa.LaunchSession(_serverName.Trim());
+            _kielbasa.LaunchSession(_serverName);
         }
 
         private bool CanExecuteLaunchSession(object parameter)
@@ -113,6 +134,19 @@
         private bool CanExecuteDeleteThreadWindow(object parameter)
         {
             return null != _threadWindow;
+        }
+
+        private void ExecuteAuthenticate(object parameter)
+        {
+            Task.Run(() =>
+            {
+                _kielbasa.Authenticate();
+            });
+        }
+
+        private void ExecuteLaunchApplication(object parameter)
+        {
+            _kielbasa.LaunchProgram();
         }
 
         #region IDisposable Support

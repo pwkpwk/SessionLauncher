@@ -21,7 +21,10 @@ namespace SessionHelper
 	Kielbasa::Kielbasa()
 	:	m_clientAx(NULL),
 		m_rdpClient(nullptr),
-		m_callbackCookie(0)
+		m_callbackCookie(0),
+		m_hwndMain(NULL),
+		m_dllGetClaimsToken(nullptr),
+		m_dllSetAdalProperties(nullptr)
 	{
 	}
 
@@ -31,6 +34,8 @@ namespace SessionHelper
 		{
 			if (UnregisterCallback(m_rdpClient, m_callbackCookie))
 				m_callbackCookie = 0;
+
+			m_rdpClient->Disconnect();
 
 			LPOLEOBJECT oobj;
 
@@ -44,7 +49,64 @@ namespace SessionHelper
 			m_rdpClient = nullptr;
 		}
 
+		m_dllGetClaimsToken = nullptr;
+		m_dllSetAdalProperties = nullptr;
 		::FreeLibrary(m_clientAx);
+	}
+
+	void Kielbasa::SetWindow(System::Windows::Interop::WindowInteropHelper ^window)
+	{
+		if (nullptr == window)
+		{
+			m_hwndMain = NULL;
+		}
+		else
+		{
+			m_hwndMain = reinterpret_cast<HWND>((HANDLE)window->EnsureHandle());
+			if (!::IsWindow(m_hwndMain))
+			{
+				m_hwndMain = NULL;
+			}
+		}
+	}
+
+	void Kielbasa::Authenticate()
+	{
+		using namespace ATL;
+
+		CComBSTR	claimsHint(OLESTR("Authority=https://login.windows.net/common;Client=69b68004-6f36-421c-9d9a-3f202cb8df47;Redirect=urn:ietf:wg:oauth:2.0:oob;Resource=https://remoteapp.windowsazure.com;Site=501413"));
+		CComBSTR	userHint(OLESTR("pakarpen@microsoft.com"));
+		CComBSTR	domainHint(OLESTR("microsoft.com"));
+		CComBSTR	bstrTitle(OLESTR("Invoke ADAL"));
+		RECT		rect[1];
+		BSTR		bstrToken;
+		BSTR		bstrUser;
+
+		(*m_dllSetAdalProperties)(m_hwndMain);
+
+		::GetWindowRect(m_hwndMain, rect);
+
+		HRESULT hr = (*m_dllGetClaimsToken)
+		(
+			claimsHint,
+			userHint,
+			domainHint,
+			TRUE,
+			m_hwndMain,
+			&bstrToken,
+			&bstrUser,
+			rect,
+			bstrTitle
+		);
+
+		if (SUCCEEDED(hr))
+		{
+			System::Diagnostics::Trace::WriteLine("Succeeded!");
+		}
+		else
+		{
+			System::Diagnostics::Trace::WriteLine("Failed!");
+		}
 	}
 
 	void Kielbasa::LaunchSession(System::String ^machineName)
@@ -87,11 +149,12 @@ namespace SessionHelper
 						CComBSTR args(OLESTR(""));
 
 						IMsRdpClientNonScriptable5 *client5;
+						IMsRdpClient9 *client9 = nullptr;
 
 						if (SUCCEEDED(m_rdpClient->QueryInterface(&client5)))
 						{
 							CComBSTR userName(OLESTR("pakarpen@microsoft.com"));
-							CComBSTR password(OLESTR("<password!>"));
+							CComBSTR password(OLESTR("<password>"));
 							CComBSTR emptyBSTR(OLESTR(""));
 							CComBSTR server(OLESTR("selfhostlive"));
 
@@ -105,7 +168,7 @@ namespace SessionHelper
 							client5->put_LaunchedViaClientShellInterface(VARIANT_FALSE);
 							client5->put_TrustedZoneSite(VARIANT_FALSE);
 							client5->put_DisableRemoteAppCapsCheck(VARIANT_FALSE);
-							client5->put_ClearTextPassword(password);
+							//client5->put_ClearTextPassword(password);
 							client5->put_EnableCredSspSupport(VARIANT_TRUE);
 							client5->put_PromptForCredentials(VARIANT_FALSE);
 							client5->put_AllowCredentialSaving(VARIANT_FALSE);
@@ -132,9 +195,6 @@ namespace SessionHelper
 								redirinfo->put_UseRedirectionServerName(VARIANT_FALSE);
 								redirinfo->Release();
 							}
-
-							IMsRdpClient9 *client9;
-							ITSRemoteProgram2 *program2 = nullptr;
 
 							ITsWkspInternal *intern;
 
@@ -173,27 +233,9 @@ namespace SessionHelper
 									secset2->Release();
 								}
 
-								if (S_OK == client9->get_RemoteProgram2(&program2))
-								{
-									program2->put_RemoteProgramMode(VARIANT_TRUE);
-									program2->put_RemoteApplicationName(appName);
-									program2->put_RemoteApplicationProgram(program);
-									program2->put_RemoteApplicationArgs(args);
-#if 0
-									program2->ServerStartProgram(
-										program,
-										args,
-										args,
-										VARIANT_FALSE,
-										args,
-										VARIANT_TRUE);
-#endif
-									program2->Release();
-								}
-
 								IMsRdpClientTransportSettings4 *transport4;
 
-								if (S_OK == client5->QueryInterface(&transport4))
+								if (S_OK == client9->get_TransportSettings4(&transport4))
 								{
 									CComBSTR gatewayHost(OLESTR("ef643b51-ae9c-4841-b041-388104ae123a.remoteapp.windowsazure.com"));
 									CComBSTR gatewayUser(userName);
@@ -216,7 +258,7 @@ namespace SessionHelper
 									transport4->put_GatewayAuthLoginPage(emptyBSTR);
 									transport4->put_GatewayUsername(gatewayUser);
 									transport4->put_GatewayDomain(emptyBSTR);
-									transport4->put_GatewayPassword(gatewayPassword);
+									//transport4->put_GatewayPassword(gatewayPassword);
 									transport4->put_GatewayBrokeringType(1);
 
 									transport4->Release();
@@ -226,8 +268,8 @@ namespace SessionHelper
 
 								if (S_OK == client9->get_AdvancedSettings9(&advset8))
 								{
-									CComBSTR lbInfo("MTB://lbinfo?param1=selfhostlive&param2=754606d9-5159-4514-8b2d-5c5a10610285");
-									lbInfo.Append(OLESTR("\r\n"));
+									static const char LBINFO[] = { "MTB://lbinfo?param1=selfhostlive&param2=754606d9-5159-4514-8b2d-5c5a10610285\r\n" };
+									BSTR lbInfo = ::SysAllocStringByteLen(LBINFO, sizeof(LBINFO) - sizeof(LBINFO[0]));
 									CComBSTR keybLayout(OLESTR("0xffffffff"));
 
 									advset8->put_AudioRedirectionMode(0);
@@ -262,8 +304,36 @@ namespace SessionHelper
 									advset8->put_SuperPanAccelerationFactor(1);
 									advset8->put_PerformanceFlags(0x186);
 									advset8->put_GrabFocusOnConnect(VARIANT_FALSE);
+									advset8->put_ContainerHandledFullScreen(TRUE);
 
 									advset8->Release();
+									::SysFreeString(lbInfo);
+								}
+								ITSRemoteProgram2 *program2;
+
+								if (SUCCEEDED(client9->get_RemoteProgram2(&program2)))
+								{
+									using namespace ATL;
+
+									CComBSTR program(OLESTR("||269f0cd2-4fa7-477c-98e7-205e9eaa2174"));
+									CComBSTR workDir(OLESTR(""));
+									CComBSTR appName("ARA CMD");
+									CComBSTR args(OLESTR(""));
+
+									program2->put_RemoteProgramMode(VARIANT_TRUE);
+									program2->put_RemoteApplicationName(appName);
+									program2->put_RemoteApplicationProgram(program);
+									program2->put_RemoteApplicationArgs(args);
+#if 1
+									program2->ServerStartProgram(
+										program,
+										args,
+										args,
+										VARIANT_FALSE,
+										args,
+										VARIANT_TRUE);
+#endif
+									program2->Release();
 								}
 
 								IMsRdpExtendedSettings *extset;
@@ -276,6 +346,7 @@ namespace SessionHelper
 
 									var = true;
 									extset->put_Property(UTREG_UI_ENABLE_REMOTEEDGEBAR, &var);
+									extset->put_Property(UTREG_GP_ENABLE_HARDWARE_MODE_GRAPHICS, &var);
 
 									var = false;
 									extset->put_Property(UTREG_UI_DISABLE_SEAMLESS_LANGUAGE_BAR, &var);
@@ -286,8 +357,6 @@ namespace SessionHelper
 
 									extset->Release();
 								}
-
-								client9->Release();
 							}
 
 							client5->Release();
@@ -295,26 +364,8 @@ namespace SessionHelper
 
 						m_rdpClient->Connect();
 
-#if 0
-						BSTR bstrServer = reinterpret_cast<BSTR>(Marshal::StringToBSTR(machineName).ToPointer());
-						m_rdpClient->put_Server(bstrServer);
-						::SysFreeString(bstrServer);
-						
-						IMsTscAdvancedSettings *as;
-						if (SUCCEEDED(m_rdpClient->get_AdvancedSettings(&as)))
-						{
-							IMsRdpClientAdvancedSettings4 *as4;
-
-							if (SUCCEEDED(as->QueryInterface(&as4)))
-							{
-								as4->put_AuthenticationLevel(2);
-								as4->Release();
-							}
-							as->Release();
-						}
-
-						m_rdpClient->Connect();
-#endif
+						if (client9)
+							client9->Release();
 					}
 
 					ownd->Release();
@@ -325,6 +376,43 @@ namespace SessionHelper
 			}
 
 			obj->Release();
+		}
+	}
+
+	void Kielbasa::LaunchProgram()
+	{
+		IMsRdpClient9 *client9;
+
+		if(SUCCEEDED(m_rdpClient->QueryInterface(&client9)))
+		{
+			ITSRemoteProgram2 *program2;
+
+			if (SUCCEEDED(client9->get_RemoteProgram2(&program2)))
+			{
+				using namespace ATL;
+
+				CComBSTR program(OLESTR("||269f0cd2-4fa7-477c-98e7-205e9eaa2174"));
+				CComBSTR workDir(OLESTR(""));
+				CComBSTR appName("ARA CMD");
+				CComBSTR args(OLESTR(""));
+
+				program2->put_RemoteProgramMode(VARIANT_TRUE);
+				program2->put_RemoteApplicationName(appName);
+				program2->put_RemoteApplicationProgram(program);
+				program2->put_RemoteApplicationArgs(args);
+
+				program2->ServerStartProgram(
+					program,
+					args,
+					args,
+					VARIANT_FALSE,
+					args,
+					VARIANT_TRUE);
+
+				program2->Release();
+			}
+
+			client9->Release();
 		}
 	}
 
@@ -350,8 +438,29 @@ namespace SessionHelper
 
 	bool Kielbasa::Initialize()
 	{
+		bool initialized = true;
+
 		m_clientAx = ::LoadLibrary(TEXT("rdclientax.dll"));
-		return NULL != m_clientAx;
+		if (!m_clientAx)
+		{
+			initialized = false;
+		}
+		else
+		{
+			m_dllGetClaimsToken = reinterpret_cast<pfnDllGetClaimsToken>(::GetProcAddress(m_clientAx, "DllGetClaimsToken"));
+			m_dllSetAdalProperties = reinterpret_cast<pfnDllSetAdalProperties>(::GetProcAddress(m_clientAx, "DllSetADALProperties"));
+
+			if (!m_dllGetClaimsToken || !m_dllSetAdalProperties)
+			{
+				initialized = false;
+				m_dllGetClaimsToken = nullptr;
+				m_dllSetAdalProperties = nullptr;
+				::FreeLibrary(m_clientAx);
+				m_clientAx = NULL;
+			}
+		}
+
+		return initialized;
 	}
 
 	bool Kielbasa::CreateControl()

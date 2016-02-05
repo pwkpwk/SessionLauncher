@@ -39,7 +39,7 @@ private:
 	void OnInternalDialogDismissed();
 	void OnRemoteProgramResult(BOOL isExecutable, LONG error, BSTR application);
 	void OnRemoteProgramDisplayed(BOOL applicationDisplayed, LONG displayInformation);
-	void OnRemoteWindowDisplayed(BOOL windowDisplayed, LONG hwnd, LONG windowInformation);
+	void OnRemoteWindowDisplayed(BOOL windowDisplayed, ULONG hwnd, ULONG windowInformation);
 	void OnLogonError(LONG code);
 	void OnFocusReleased(LONG direction);
 	void OnUserNameAcquired(BSTR userName);
@@ -48,4 +48,5 @@ private:
 	void OnConnectionBarDevices();
 	void OnAutoReconnecting();
 	void OnAutoReconnected();
+	void OnNetworkStatusChanged(INT32 n1, INT32 n2, UINT32 n3);
 };

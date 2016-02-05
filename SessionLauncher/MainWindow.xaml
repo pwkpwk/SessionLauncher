@@ -13,14 +13,20 @@
     
     <Grid>
         <StackPanel Margin="10,0" VerticalAlignment="Center">
-            <TextBox Margin="0,0,0,5" Text="{Binding ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Command="{Binding LaunchSession}">
+            <TextBox Text="{Binding ServerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Command="{Binding Authenticate}" Margin="0,5,0,0">
+                <TextBlock Text="Authenticate"/>
+            </Button>
+            <Button Command="{Binding LaunchSession}" Margin="0,5,0,0">
                 <TextBlock Text="Launch Session"/>
             </Button>
-            <Button Command="{Binding ShowThreadWindow}">
+            <Button Command="{Binding LaunchApplication}" Margin="0,5,0,0">
+                <TextBlock Text="Launch Application"/>
+            </Button>
+            <Button Command="{Binding ShowThreadWindow}" Margin="0,5,0,0">
                 <TextBlock Text="Create Thread Window"/>
             </Button>
-            <Button Command="{Binding DeleteThreadWindow}">
+            <Button Command="{Binding DeleteThreadWindow}" Margin="0,5,0,0">
                 <TextBlock Text="Delete Thread Window"/>
             </Button>
         </StackPanel>
